@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affiliate Leaderboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07080d;
+    --panel:rgba(255,255,255,0.035);
+    --panel-solid:#10131b;
+    --line:rgba(255,255,255,0.08);
+    --lime:#c6ff3d;
+    --lime-dim:#5c7a1a;
+    --violet:#8b6bff;
+    --gold:#ffd76b;
+    --silver:#cfd8e3;
+    --bronze:#e3a76f;
+    --text:#eef1f7;
+    --muted:#8a90a3;
+    --mono:'JetBrains Mono', monospace;
+    --display:'Rajdhani', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+  }
+
+  /* ---- receding grid floor ---- */
+  .grid-floor{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(ellipse 900px 500px at 50% 0%, rgba(139,107,255,0.16), transparent 65%),
+      radial-gradient(ellipse 700px 420px at 50% 100%, rgba(198,255,61,0.08), transparent 60%);
+  }
+  .grid-floor::after{
+    content:'';position:absolute;left:0;right:0;bottom:0;height:60%;
+    background-image:
+      linear-gradient(rgba(198,255,61,0.10) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(198,255,61,0.10) 1px, transparent 1px);
+    background-size:56px 56px;
+    transform:perspective(400px) rotateX(55deg);
+    transform-origin:bottom;
+    mask-image:linear-gradient(to top, black, transparent 85%);
+    -webkit-mask-image:linear-gradient(to top, black, transparent 85%);
+    opacity:.55;
+  }
+
+  /* ---- ambient background: glow orbs + drifting particles ---- */
+  .floaters{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .orb{
+    position:absolute;border-radius:50%;filter:blur(60px);
+    animation:orbDrift ease-in-out infinite;
+  }
+  @keyframes orbDrift{
+    0%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(30px,-40px) scale(1.08);}
+    100%{transform:translate(0,0) scale(1);}
+  }
+  .particle{
+    position:absolute;border-radius:50%;background:var(--lime);
+    animation:twinkle ease-in-out infinite, particleDrift linear infinite;
+  }
+  @keyframes twinkle{0%,100%{opacity:.15;}50%{opacity:.75;}}
+  @keyframes particleDrift{
+    0%{transform:translateY(0);}
+    100%{transform:translateY(-40px);}
+  }
+
+  .page{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:28px 20px 90px;}
+
+  /* ---- CTA banner ---- */
+  .cta-banner{
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+    background:linear-gradient(135deg, rgba(198,255,61,0.10), rgba(139,107,255,0.10));
+    border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin-bottom:24px;
+    backdrop-filter:blur(6px);
+  }
+  .cta-text{font-size:13.5px;color:var(--text);}
+  .cta-text b{color:var(--lime);font-family:var(--mono);letter-spacing:.03em;}
+  .cta-links{display:flex;gap:10px;flex-wrap:wrap;}
+  .cta-btn{
+    display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:8px;
+    font-size:13px;font-weight:600;text-decoration:none;transition:transform .15s, box-shadow .15s;
+  }
+  .cta-btn.primary{background:var(--lime);color:#0a0d06;}
+  .cta-btn.primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(198,255,61,0.3);}
+  .cta-btn.discord{background:#5865F2;color:#fff;}
+  .cta-btn.discord:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(88,101,242,0.35);}
+  .cta-btn svg{width:15px;height:15px;}
+
+  /* ---- stats strip ---- */
+  .stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+  .stat-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;text-align:center;backdrop-filter:blur(6px);
+  }
+  .stat-val{font-family:var(--mono);font-weight:700;font-size:19px;color:var(--lime);}
+  .stat-label{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;}
+
+  .live-dot{
+    display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--lime);
+    margin-right:6px;box-shadow:0 0 8px var(--lime);animation:pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+  /* ---- search ---- */
+  .search-wrap{position:relative;margin-bottom:14px;}
+  .search-input{
+    width:100%;background:var(--panel);border:1px solid var(--line);color:var(--text);
+    padding:11px 14px 11px 38px;border-radius:10px;font-size:13.5px;font-family:'Inter',sans-serif;
+    backdrop-filter:blur(6px);
+  }
+  .search-input::placeholder{color:var(--muted);}
+  .search-input:focus{outline:none;border-color:var(--lime);}
+  .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--muted);pointer-events:none;}
+
+  /* ---- entrance animation ---- */
+  .pod-card, .row{animation:riseIn .5s ease both;}
+  @keyframes riseIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ---- page nav ---- */
+  .page-nav{display:flex;gap:22px;}
+  .page-tab{
+    padding:4px 0;font-family:var(--display);font-size:15px;font-weight:600;letter-spacing:.02em;
+    text-transform:uppercase;color:var(--muted);cursor:pointer;
+    border-bottom:2px solid transparent;transition:color .15s, border-color .15s;
+  }
+  .page-tab.active{color:var(--lime);border-color:var(--lime);}
+  .page-tab:not(.active):hover{color:var(--text);}
+
+  /* ---- sub toolbar (period tabs + refresh) ---- */
+  .sub-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:28px;}
+  .toolbar-right{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);}
+
+  /* ---- rewards view ---- */
+  .rewards-intro{max-width:520px;margin:14px auto 0;color:var(--muted);font-size:14px;line-height:1.6;}
+  .reward-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px;}
+  .reward-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:22px 18px;text-align:center;backdrop-filter:blur(6px);
+  }
+  .reward-icon{font-size:30px;margin-bottom:10px;}
+  .reward-card h3{font-family:var(--display);font-size:17px;margin:0 0 6px;text-transform:uppercase;letter-spacing:.02em;}
+  .reward-amt{font-family:var(--mono);color:var(--lime);font-weight:700;font-size:15px;margin-bottom:12px;}
+  .reward-card ul{list-style:none;margin:0;padding:0;text-align:left;}
+  .reward-card li{
+    font-size:12.5px;color:var(--muted);line-height:1.5;padding-left:16px;position:relative;margin-bottom:6px;
+  }
+  .reward-card li::before{content:'•';position:absolute;left:2px;color:var(--lime);}
+
+  .clothing-section{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:28px 20px;margin-bottom:24px;backdrop-filter:blur(6px);
+  }
+  .milestone-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .milestone-card{
+    background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:12px;
+    padding:18px;text-align:center;
+  }
+  .milestone-icon{font-size:26px;margin-bottom:8px;}
+  .milestone-req{font-family:var(--mono);font-size:14px;color:var(--text);font-weight:600;}
+  .milestone-arrow{color:var(--lime);font-size:18px;margin:6px 0;}
+  .milestone-reward{font-family:var(--display);font-size:16px;color:var(--lime);font-weight:700;}
+
+  .rewards-footer-cta{
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+    background:linear-gradient(135deg, rgba(198,255,61,0.10), rgba(139,107,255,0.10));
+    border:1px solid var(--line);border-radius:14px;padding:20px 24px;margin-bottom:24px;
+  }
+
+  /* ---- referral view ---- */
+  .referral-link-box{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:16px 20px;margin:24px 0 32px;backdrop-filter:blur(6px);
+  }
+  .referral-link-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:600;}
+  .referral-link-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .referral-link-input{
+    flex:1;min-width:200px;background:var(--panel-solid);border:1px solid var(--line);color:var(--text);
+    padding:10px 14px;border-radius:8px;font-family:var(--mono);font-size:13px;
+  }
+
+  .section-heading{
+    font-family:var(--display);font-size:20px;text-transform:uppercase;letter-spacing:.03em;
+    color:var(--text);margin:0 0 14px;text-align:center;
+  }
+
+  .steps-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+  .step-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:22px 18px;text-align:center;backdrop-filter:blur(6px);
+  }
+  .step-num{
+    width:32px;height:32px;border-radius:50%;background:var(--lime);color:#0a0d06;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 12px;
+    font-family:var(--display);font-weight:700;font-size:15px;
+  }
+  .step-card h3{font-family:var(--display);font-size:15.5px;margin:0 0 8px;text-transform:uppercase;}
+  .step-card p{font-size:12.5px;color:var(--muted);line-height:1.55;margin:0;}
+
+  .tier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:36px;}
+  .tier-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:18px 14px;text-align:center;backdrop-filter:blur(6px);
+  }
+  .tier-card.highlight{border-color:rgba(198,255,61,0.4);box-shadow:0 0 24px rgba(198,255,61,0.10);}
+  .tier-req{font-family:var(--display);font-size:15px;color:var(--lime);font-weight:700;margin-bottom:10px;text-transform:uppercase;}
+  .tier-card ul{list-style:none;margin:0;padding:0;}
+  .tier-card li{font-size:12.5px;color:var(--text);margin-bottom:5px;}
+
+  .qualify-box{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:20px 24px;margin-bottom:24px;backdrop-filter:blur(6px);
+  }
+  .qualify-list{margin:0;padding:0;list-style:none;}
+  .qualify-list li{
+    font-size:13px;color:var(--text);padding-left:22px;position:relative;margin-bottom:9px;line-height:1.5;
+  }
+  .qualify-list li::before{content:'✓';position:absolute;left:0;color:var(--lime);font-weight:700;}
+  .qualify-list li:last-child{margin-bottom:0;}
+
+  .warning-box{
+    background:rgba(255,138,128,0.08);border:1px solid rgba(255,138,128,0.3);border-radius:14px;
+    padding:16px 20px;margin-bottom:28px;font-size:12.5px;color:#ffb3a8;line-height:1.6;
+  }
+
+  /* ---- livestream section ---- */
+  .stream-section{margin-bottom:32px;}
+  .stream-name{color:var(--lime);}
+  .stream-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    overflow:hidden;backdrop-filter:blur(6px);
+  }
+  .stream-embed{position:relative;width:100%;padding-top:56.25%;background:#000;}
+  .stream-embed iframe{position:absolute;inset:0;width:100%;height:100%;}
+  .stream-footer{
+    display:flex;align-items:center;gap:8px;padding:12px 16px;
+    font-size:13px;color:var(--muted);border-top:1px solid var(--line);
+  }
+
+  /* ---- lock card ---- */
+  .lock-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:20px;
+    padding:40px 28px;text-align:center;margin-bottom:24px;backdrop-filter:blur(6px);
+  }
+  .lock-icon{font-size:38px;margin-bottom:12px;}
+  .lock-title{font-family:var(--display);font-size:24px;text-transform:uppercase;letter-spacing:.03em;margin-bottom:10px;}
+  .lock-text{max-width:420px;margin:0 auto 22px;color:var(--muted);font-size:13.5px;line-height:1.6;}
+  .lock-progress-track{
+    max-width:420px;margin:0 auto;height:10px;border-radius:6px;background:var(--panel-solid);
+    border:1px solid var(--line);overflow:hidden;
+  }
+  .lock-progress-fill{height:100%;background:linear-gradient(90deg, var(--lime-dim), var(--lime));border-radius:6px;transition:width .6s ease;}
+  .lock-progress-label{font-family:var(--mono);font-size:12.5px;color:var(--lime);margin-top:8px;font-weight:600;}
+
+  header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:20px;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand-mark{
+    width:40px;height:40px;border-radius:10px;
+    background:linear-gradient(135deg, var(--lime), var(--lime-dim));
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--display);font-weight:700;color:#0a0d06;font-size:19px;
+    box-shadow:0 0 22px rgba(198,255,61,0.35);
+  }
+
+  .refresh-btn{
+    background:var(--panel);border:1px solid var(--line);color:var(--text);
+    padding:9px 14px;border-radius:8px;font-size:13px;cursor:pointer;
+    display:flex;align-items:center;gap:8px;transition:border-color .15s, color .15s;
+    font-family:'Inter',sans-serif;backdrop-filter:blur(6px);
+  }
+  .refresh-btn:hover{border-color:var(--lime);color:var(--lime);}
+  .refresh-btn svg{width:14px;height:14px;transition:transform .5s;}
+  .refresh-btn.spinning svg{animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---- period tabs ---- */
+  .tabs{display:flex;gap:6px;margin-bottom:28px;background:var(--panel);padding:5px;border-radius:10px;border:1px solid var(--line);width:fit-content;backdrop-filter:blur(6px);}
+  .tab{
+    padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;color:var(--muted);
+    cursor:pointer;user-select:none;transition:all .15s;
+  }
+  .tab.active{background:var(--lime);color:#0a0d06;}
+  .tab:not(.active):hover{color:var(--text);}
+
+  /* ---- title-block ---- */
+  .title-block{text-align:center;margin-bottom:26px;}
+  .title-block .eyebrow{font-family:var(--display);font-size:18px;letter-spacing:.08em;color:var(--lime);text-transform:uppercase;font-weight:700;margin-bottom:4px;}
+  .sub-heading{font-family:var(--display);font-size:16px;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-top:2px;font-weight:600;}
+  .title-block h2{font-family:var(--display);font-size:44px;margin:0;letter-spacing:.03em;text-transform:uppercase;
+    background:linear-gradient(180deg, #fff, #b9c0d1);-webkit-background-clip:text;background-clip:text;color:transparent;}
+
+  .countdown{display:flex;justify-content:center;gap:10px;margin:22px 0 32px;}
+  .cd-box{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:10px 16px;min-width:64px;text-align:center;backdrop-filter:blur(6px);
+  }
+  .cd-num{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--lime);}
+  .cd-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
+
+  /* ---- podium ---- */
+  .podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:14px;align-items:end;margin-bottom:28px;}
+  .pod-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:22px 14px 18px;text-align:center;position:relative;backdrop-filter:blur(6px);
+  }
+  .pod-card.rank1{padding-top:30px;padding-bottom:24px;border-color:rgba(198,255,61,0.4);
+    box-shadow:0 0 40px rgba(198,255,61,0.12);}
+  .pod-avatar{
+    width:64px;height:64px;border-radius:50%;margin:0 auto 12px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--display);font-weight:700;font-size:22px;color:#0a0d06;
+  }
+  .rank1 .pod-avatar{width:76px;height:76px;font-size:26px;background:linear-gradient(135deg, var(--gold), #ffb347);box-shadow:0 0 24px rgba(255,215,107,0.4);}
+  .rank2 .pod-avatar{background:linear-gradient(135deg, var(--silver), #9aa5b8);}
+  .rank3 .pod-avatar{background:linear-gradient(135deg, var(--bronze), #b97a48);}
+  .pod-medal{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
+  .rank1 .pod-medal{color:var(--gold);}
+  .pod-name{font-weight:600;font-size:14.5px;margin-bottom:12px;word-break:break-word;}
+  .pod-stat{margin-bottom:8px;}
+  .pod-stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+  .pod-stat-val{font-family:var(--mono);font-weight:700;font-size:15px;}
+  .pod-stat-val.prize{color:var(--lime);}
+
+  /* ---- table ---- */
+  .board{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;backdrop-filter:blur(6px);
+  }
+  .thead{
+    display:grid;grid-template-columns:50px 1fr auto auto;gap:14px;
+    padding:12px 20px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+    border-bottom:1px solid var(--line);font-weight:600;
+  }
+  .row{
+    display:grid;grid-template-columns:50px 1fr auto auto;align-items:center;gap:14px;
+    padding:13px 20px;border-bottom:1px solid var(--line);
+  }
+  .row:last-child{border-bottom:none;}
+  .row:hover{background:rgba(255,255,255,0.03);}
+  .rank{font-family:var(--mono);font-weight:700;color:var(--muted);font-size:14px;}
+  .name{font-weight:500;font-size:14px;}
+  .col-right{text-align:right;font-family:var(--mono);font-weight:600;font-size:13.5px;}
+  .col-right.prize{color:var(--lime);}
+
+  .state-msg{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px;}
+  .state-msg.error{color:#ff8a80;}
+  .state-msg code{background:var(--panel-solid);padding:2px 6px;border-radius:4px;font-family:var(--mono);font-size:12px;}
+
+  footer{margin-top:28px;text-align:center;color:var(--muted);font-size:12px;}
+  footer a{color:var(--lime);text-decoration:none;}
+
+  @media (max-width:600px){
+    .title-block h2{font-size:32px;}
+    .podium{grid-template-columns:1fr;gap:12px;}
+    .pod-card.rank1{order:-1;}
+    .countdown{gap:6px;}
+    .cd-box{min-width:52px;padding:8px 10px;}
+    .cd-num{font-size:18px;}
+    .thead{display:none;}
+    .stats-strip{grid-template-columns:1fr;}
+    .row{grid-template-columns:28px 1fr auto;padding:12px 14px;}
+    .col-right.prize{display:none;}
+    .reward-grid{grid-template-columns:1fr;}
+    .milestone-row{grid-template-columns:1fr;}
+    .steps-row{grid-template-columns:1fr;}
+    .tier-grid{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+<div class="grid-floor"></div>
+<div class="floaters" id="floaters"></div>
+<div class="page">
+
+  <div class="cta-banner">
+    <div class="cta-text">Sign up under code <b>ZYROO</b> to be eligible for the leaderboard.</div>
+    <div class="cta-links">
+      <a class="cta-btn primary" href="https://rainbet.com/?r=zyroo" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-6z"/></svg>
+        Sign Up
+      </a>
+      <a class="cta-btn discord" href="https://discord.gg/DgQs9AtbNj" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.9A18 18 0 0 0 15.9 3.5c-.2.4-.5.9-.6 1.3a16.7 16.7 0 0 0-5 0c-.2-.4-.4-.9-.6-1.3A18 18 0 0 0 5.2 4.9C2.5 8.9 1.8 12.8 2.1 16.7a18 18 0 0 0 5.5 2.8c.4-.6.8-1.3 1.1-2a11.6 11.6 0 0 1-1.8-.9l.4-.3a12.9 12.9 0 0 0 11 0l.4.3c-.6.3-1.2.6-1.8.9.3.7.7 1.4 1.1 2a18 18 0 0 0 5.5-2.8c.4-4.5-.7-8.4-3.2-11.8ZM9 14.4c-.9 0-1.6-.8-1.6-1.8S8.1 10.8 9 10.8s1.6.8 1.6 1.8-.7 1.8-1.6 1.8Zm6 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.6.8 1.6 1.8-.7 1.8-1.6 1.8Z"/></svg>
+        Discord
+      </a>
+    </div>
+  </div>
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">R</div>
+    </div>
+    <div class="page-nav" id="pageNav">
+      <div class="page-tab active" data-page="leaderboard">Leaderboard</div>
+      <div class="page-tab" data-page="rewards">Why Sign Up?</div>
+      <div class="page-tab" data-page="referral">Referral Program</div>
+    </div>
+  </header>
+
+  <div class="sub-toolbar" id="tabs">
+    <div class="tabs">
+      <div class="tab" data-period="week">This Week</div>
+      <div class="tab active" data-period="month">This Month</div>
+    </div>
+    <div class="toolbar-right">
+      <span class="live-dot"></span><span id="rangeLabel">Loading range…</span>
+      <button class="refresh-btn" id="refreshBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <div id="viewLeaderboard">
+
+  <div class="stream-section">
+    <div class="section-heading">Watch <span class="stream-name">ZYROO</span> Live</div>
+    <div class="stream-card">
+      <div class="stream-embed">
+        <iframe
+          src="https://player.kick.com/zyrostv"
+          frameborder="0"
+          allowfullscreen
+          title="ZYROO Kick Livestream">
+        </iframe>
+      </div>
+      <div class="stream-footer">
+        <span class="live-dot"></span>
+        <span>Live on Kick</span>
+        <a class="cta-btn primary" href="https://kick.com/zyrostv" target="_blank" rel="noopener" style="margin-left:auto;">Watch on Kick</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="title-block">
+    <div class="eyebrow">$2,000</div>
+    <h2>Leaderboard</h2>
+  </div>
+
+  <div class="countdown" id="countdown">
+    <div class="cd-box"><div class="cd-num" id="cdDays">--</div><div class="cd-label">Days</div></div>
+    <div class="cd-box"><div class="cd-num" id="cdHours">--</div><div class="cd-label">Hours</div></div>
+    <div class="cd-box"><div class="cd-num" id="cdMins">--</div><div class="cd-label">Minutes</div></div>
+    <div class="cd-box"><div class="cd-num" id="cdSecs">--</div><div class="cd-label">Seconds</div></div>
+  </div>
+
+  <div id="lockOverlay" class="lock-card" style="display:none">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-title">Leaderboard Locked</div>
+    <p class="lock-text">The leaderboard unlocks once the community wagers <b>$100,000</b> total on code <b>ZYROO</b>. Keep playing to help unlock it!</p>
+    <div class="lock-progress-track">
+      <div class="lock-progress-fill" id="lockProgressFill" style="width:0%"></div>
+    </div>
+    <div class="lock-progress-label" id="lockProgressLabel">$0 / $100,000 wagered</div>
+    <a class="cta-btn primary" href="https://rainbet.com/?r=zyroo" target="_blank" rel="noopener" style="margin-top:16px;display:inline-flex;">Play Now</a>
+  </div>
+
+  <div id="unlockedContent">
+  <div id="podiumSlot"></div>
+
+  <div class="stats-strip" id="statsStrip">
+    <div class="stat-card"><div class="stat-val" id="statPool">--</div><div class="stat-label">Prize Pool</div></div>
+    <div class="stat-card"><div class="stat-val" id="statWagered">--</div><div class="stat-label">Total Wagered</div></div>
+    <div class="stat-card"><div class="stat-val" id="statCount">--</div><div class="stat-label">Participants</div></div>
+  </div>
+
+  <div class="search-wrap">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input class="search-input" id="searchInput" type="text" placeholder="Find a user on the leaderboard…">
+  </div>
+
+  <div class="board" id="board">
+    <div class="state-msg">Loading leaderboard…</div>
+  </div>
+  </div>
+  </div>
+
+  <div id="viewRewards" style="display:none">
+
+    <div class="title-block">
+      <div class="eyebrow">🎉 Code ZYROO</div>
+      <h2 style="font-size:34px;">Unlock Exclusive Rewards</h2>
+      <p class="rewards-intro">Sign up using code <b>ZYROO</b> and get access to exclusive community rewards, on top of everything Rainbet already offers.</p>
+    </div>
+
+    <div class="reward-grid">
+      <div class="reward-card">
+        <div class="reward-icon">💰</div>
+        <h3>10% Deposit Bonus</h3>
+        <div class="reward-amt">Up to $100</div>
+        <ul>
+          <li>Receive a 10% bonus on your deposit (maximum $100)</li>
+          <li>Wagering requirements apply</li>
+        </ul>
+      </div>
+
+      <div class="reward-card">
+        <div class="reward-icon">🏆</div>
+        <h3>Monthly Leaderboard</h3>
+        <div class="reward-amt">$2,000 Pool</div>
+        <ul>
+          <li>Compete against other players for your share of the prize pool</li>
+        </ul>
+      </div>
+
+      <div class="reward-card">
+        <div class="reward-icon">🤝</div>
+        <h3>Affiliate Commission Cashback</h3>
+        <div class="reward-amt">100% Back</div>
+        <ul>
+          <li>I give 100% of the affiliate commission I earn from your play back to you</li>
+          <li>Adds even more value over time</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="clothing-section">
+      <div class="title-block" style="margin-bottom:18px;">
+        <div class="eyebrow">👕 Prospera Clothing Rewards</div>
+        <h2 style="font-size:26px;">The more you play, the bigger the rewards</h2>
+      </div>
+      <div class="milestone-row">
+        <div class="milestone-card">
+          <div class="milestone-icon">🔥</div>
+          <div class="milestone-req">Wager $100,000</div>
+          <div class="milestone-arrow">→</div>
+          <div class="milestone-reward">$400 in Prospera Brand clothing</div>
+        </div>
+        <div class="milestone-card">
+          <div class="milestone-icon">💎</div>
+          <div class="milestone-req">Wager $250,000</div>
+          <div class="milestone-arrow">→</div>
+          <div class="milestone-reward">$1,000 in Prospera Brand clothing</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:18px;">
+        <a class="cta-btn primary" href="https://prosperabrand.com" target="_blank" rel="noopener" style="display:inline-flex;">Browse the Collection</a>
+      </div>
+    </div>
+
+    <div class="rewards-footer-cta">
+      <div class="cta-text" style="font-size:15px;">Sign up with code <b>ZYROO</b> and start earning rewards from day one.</div>
+      <a class="cta-btn primary" href="https://rainbet.com/?r=zyroo" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-6z"/></svg>
+        Sign Up Now
+      </a>
+    </div>
+
+  </div>
+
+  <div id="viewReferral" style="display:none">
+
+    <div class="title-block">
+      <div class="eyebrow">🤝 Team ZYROO</div>
+      <h2 style="font-size:34px;">Refer Friends. Earn Bigger Rewards.</h2>
+      <p class="rewards-intro">Love being part of Team ZYROO? Invite your friends and get rewarded every time someone joins using code <b>ZYROO</b>. The more qualified referrals you bring in, the more exclusive rewards you'll unlock — from cash bonuses and free deposits to Prospera apparel and VIP perks.</p>
+    </div>
+
+    <div class="referral-link-box">
+      <div class="referral-link-label">Referral Code: ZYROO</div>
+      <div class="referral-link-row">
+        <input type="text" class="referral-link-input" id="referralLinkInput" value="https://rainbet.com/?r=zyroo" readonly>
+        <button class="cta-btn primary" id="copyReferralBtn" style="display:inline-flex;">Copy</button>
+      </div>
+    </div>
+
+    <div class="section-heading">How It Works</div>
+    <div class="steps-row">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3>Share Code ZYROO</h3>
+        <p>Invite your friends and have them sign up on Rainbet using code ZYROO.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3>They Sign Up &amp; Play</h3>
+        <p>Your referral must create a new Rainbet account using code ZYROO, make a qualifying deposit, and meet the required wagering threshold.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3>Earn Rewards</h3>
+        <p>Once your referral qualifies, you'll receive credit toward referral milestones and unlock exclusive rewards.</p>
+      </div>
+    </div>
+
+    <div class="section-heading">Referral Rewards</div>
+    <div class="tier-grid">
+      <div class="tier-card">
+        <div class="tier-req">1 Referral</div>
+        <ul><li>🎁 Surprise Welcome Reward</li></ul>
+      </div>
+      <div class="tier-card">
+        <div class="tier-req">3 Referrals</div>
+        <ul><li>💸 $25 Bonus</li></ul>
+      </div>
+      <div class="tier-card">
+        <div class="tier-req">5 Referrals</div>
+        <ul>
+          <li>💰 $50 Bonus</li>
+          <li>👕 Exclusive Prospera Merch</li>
+        </ul>
+      </div>
+      <div class="tier-card">
+        <div class="tier-req">10 Referrals</div>
+        <ul>
+          <li>💵 $150 Bonus</li>
+          <li>🏆 VIP Discord Role</li>
+          <li>🎟️ Exclusive Giveaway Entries</li>
+        </ul>
+      </div>
+      <div class="tier-card highlight">
+        <div class="tier-req">25 Referrals</div>
+        <ul>
+          <li>🔥 $500 Bonus</li>
+          <li>👕 Premium Prospera Package</li>
+          <li>⭐ VIP Community Status</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-heading">What Counts as a Qualified Referral?</div>
+    <div class="qualify-box">
+      <ul class="qualify-list">
+        <li>They are a brand-new Rainbet user</li>
+        <li>They register using code ZYROO</li>
+        <li>They make a qualifying deposit</li>
+        <li>They complete the required wagering amount</li>
+        <li>They are verified as a legitimate player (no duplicate, alternate, or fraudulent accounts)</li>
+      </ul>
+    </div>
+
+    <div class="warning-box">
+      ⚠️ Any attempt to abuse the referral system — including self-referrals, duplicate accounts, VPN abuse, or bonus farming — will result in rewards being forfeited.
+    </div>
+
+    <div class="rewards-footer-cta">
+      <div class="cta-text" style="font-size:15px;">Start sharing your code today and turn your community into rewards.</div>
+      <a class="cta-btn primary" href="https://rainbet.com/?r=zyroo" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-6z"/></svg>
+        Sign Up Now
+      </a>
+    </div>
+
+  </div>
+
+  <footer>Live data from Rainbet · Ranked by total wagered · <a href="https://discord.gg/DgQs9AtbNj" target="_blank" rel="noopener">Join our Discord</a></footer>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG — edit here if Rainbet's API shape differs, or to
+   change the prize pool / payout split.
+   ============================================================ */
+const CONFIG = {
+  apiKey: 'psklPvJfIsY97LA5rJTROSTaVS0I2r5F',
+  baseUrl: 'https://services.rainbet.com/v1/external/affiliates',
+  fieldMap: {
+    name: ['username', 'user', 'name', 'display_name'],
+    wagered: ['wagered_amount', 'wagered', 'total_wagered', 'amount', 'wager'],
+  },
+  // Total prize pool for the active period, split by rank (%).
+  // Ranks beyond this list get $0. Adjust freely.
+  prizePool: 2000,
+  payoutSplit: [850, 450, 250, 122, 98, 78, 61, 45, 25, 21], // dollar amount per rank, 1st -> 10th (sums to prizePool, strictly decreasing)
+
+  // ---- Manual unlock tracking ----
+  // The leaderboard stays locked until wagered reaches unlockThreshold.
+  // Update currentWagered by hand as the total grows — no live API check.
+  unlockThreshold: 100000,
+  currentWagered: 44182.93
+};
+
+const tabs = document.querySelectorAll('.tab');
+const pageTabs = document.querySelectorAll('.page-tab');
+const viewLeaderboard = document.getElementById('viewLeaderboard');
+const viewRewards = document.getElementById('viewRewards');
+const viewReferral = document.getElementById('viewReferral');
+const board = document.getElementById('board');
+const podiumSlot = document.getElementById('podiumSlot');
+const rangeLabel = document.getElementById('rangeLabel');
+const refreshBtn = document.getElementById('refreshBtn');
+
+pageTabs.forEach(pt => {
+  pt.addEventListener('click', () => {
+    pageTabs.forEach(t => t.classList.remove('active'));
+    pt.classList.add('active');
+    const page = pt.dataset.page;
+    viewLeaderboard.style.display = page === 'leaderboard' ? '' : 'none';
+    viewRewards.style.display = page === 'rewards' ? '' : 'none';
+    viewReferral.style.display = page === 'referral' ? '' : 'none';
+    document.getElementById('tabs').style.display = page === 'leaderboard' ? '' : 'none';
+  });
+});
+
+const copyReferralBtn = document.getElementById('copyReferralBtn');
+if (copyReferralBtn) {
+  copyReferralBtn.addEventListener('click', () => {
+    const input = document.getElementById('referralLinkInput');
+    input.select();
+    input.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(input.value).then(() => {
+      const original = copyReferralBtn.textContent;
+      copyReferralBtn.textContent = 'Copied!';
+      setTimeout(() => { copyReferralBtn.textContent = original; }, 1500);
+    }).catch(() => {
+      document.execCommand('copy');
+    });
+  });
+}
+
+let currentPeriod = 'month';
+let countdownTimer = null;
+
+function getDateRange(period) {
+  const end = new Date();
+  const start = new Date();
+  if (period === 'today') {
+    start.setHours(0,0,0,0);
+  } else if (period === 'week') {
+    start.setDate(start.getDate() - 7);
+  } else if (period === 'month') {
+    start.setDate(start.getDate() - 30);
+  } else {
+    start.setFullYear(start.getFullYear() - 3);
+  }
+  const fmt = d => d.toISOString().split('T')[0];
+  return { start_at: fmt(start), end_at: fmt(end) };
+}
+
+function getPeriodEnd(period) {
+  const now = new Date();
+  if (period === 'today') {
+    const end = new Date(now); end.setHours(24,0,0,0); return end;
+  }
+  if (period === 'week') {
+    const end = new Date(now); end.setDate(end.getDate() + (7 - end.getDay())); end.setHours(0,0,0,0); return end;
+  }
+  if (period === 'month') {
+    return new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  }
+  return new Date(now.getFullYear() + 1, 0, 1);
+}
+
+function startCountdown(period) {
+  if (countdownTimer) clearInterval(countdownTimer);
+  const tick = () => {
+    const diff = getPeriodEnd(period) - new Date();
+    const d = Math.max(0, Math.floor(diff / 86400000));
+    const h = Math.max(0, Math.floor((diff % 86400000) / 3600000));
+    const m = Math.max(0, Math.floor((diff % 3600000) / 60000));
+    const s = Math.max(0, Math.floor((diff % 60000) / 1000));
+    document.getElementById('cdDays').textContent = d;
+    document.getElementById('cdHours').textContent = String(h).padStart(2,'0');
+    document.getElementById('cdMins').textContent = String(m).padStart(2,'0');
+    document.getElementById('cdSecs').textContent = String(s).padStart(2,'0');
+  };
+  tick();
+  countdownTimer = setInterval(tick, 1000);
+}
+
+function pickField(obj, candidates) {
+  for (const key of candidates) {
+    if (obj[key] !== undefined) return obj[key];
+  }
+  return undefined;
+}
+
+function normalizeEntries(raw) {
+  let list = null;
+  if (Array.isArray(raw)) list = raw;
+  else if (raw && Array.isArray(raw.affiliates)) list = raw.affiliates;
+  else if (raw && Array.isArray(raw.data)) list = raw.data;
+  else if (raw && Array.isArray(raw.results)) list = raw.results;
+  if (!list) return null;
+
+  return list
+    .map(entry => {
+      const name = pickField(entry, CONFIG.fieldMap.name) ?? 'Unknown';
+      const wageredRaw = pickField(entry, CONFIG.fieldMap.wagered) ?? 0;
+      const wagered = typeof wageredRaw === 'string' ? parseFloat(wageredRaw) : wageredRaw;
+      return { name, wagered: isNaN(wagered) ? 0 : wagered };
+    })
+    .sort((a, b) => b.wagered - a.wagered);
+}
+
+function formatUSD(n) {
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function prizeForRank(rank) {
+  return CONFIG.payoutSplit[rank - 1] || 0;
+}
+
+function initials(name) {
+  return name.split(/\s+/).map(p => p[0]).join('').slice(0,2).toUpperCase();
+}
+
+function renderError(message, raw) {
+  podiumSlot.innerHTML = '';
+  board.innerHTML = `
+    <div class="state-msg error">
+      ${message}<br><br>
+      <code>${CONFIG.baseUrl}</code>
+    </div>`;
+  if (raw) console.log('Raw API response for debugging:', raw);
+}
+
+function podiumCard(entry, rank) {
+  const label = rank === 1 ? '1st' : rank === 2 ? '2nd' : '3rd';
+  return `
+    <div class="pod-card rank${rank}">
+      <div class="pod-avatar">${initials(entry.name)}</div>
+      <div class="pod-medal">${label} Place</div>
+      <div class="pod-name">${entry.name}</div>
+      <div class="pod-stat">
+        <div class="pod-stat-label">Wagered</div>
+        <div class="pod-stat-val">${formatUSD(entry.wagered)}</div>
+      </div>
+      <div class="pod-stat">
+        <div class="pod-stat-label">Prize</div>
+        <div class="pod-stat-val prize">${formatUSD(prizeForRank(rank))}</div>
+      </div>
+    </div>`;
+}
+
+function render(entries) {
+  if (!entries || entries.length === 0) {
+    renderError('No affiliate data returned for this period.');
+    return;
+  }
+
+  const totalWagered = entries.reduce((sum, e) => sum + e.wagered, 0);
+  document.getElementById('statWagered').textContent = formatUSD(totalWagered);
+  document.getElementById('statCount').textContent = entries.length;
+
+  const [first, second, third] = [entries[0], entries[1], entries[2]];
+  podiumSlot.innerHTML = `
+    <div class="podium">
+      ${second ? podiumCard(second, 2) : '<div></div>'}
+      ${first ? podiumCard(first, 1) : '<div></div>'}
+      ${third ? podiumCard(third, 3) : '<div></div>'}
+    </div>`;
+  podiumSlot.querySelectorAll('.pod-card').forEach((el, i) => el.style.animationDelay = (i * 0.08) + 's');
+
+  window.currentEntries = entries;
+  renderTable(entries.slice(3, 25), 4);
+}
+
+function renderTable(rest, startRank) {
+  const rows = rest.map((e, i) => {
+    const rank = startRank + i;
+    return `
+      <div class="row" style="animation-delay:${Math.min(i * 0.03, 0.4)}s">
+        <div class="rank">${rank}</div>
+        <div class="name">${e.name}</div>
+        <div class="col-right">${formatUSD(e.wagered)}</div>
+        <div class="col-right prize">${formatUSD(prizeForRank(rank))}</div>
+      </div>`;
+  }).join('');
+
+  board.innerHTML = `
+    <div class="thead">
+      <div>Pos</div><div>User</div><div style="text-align:right">Wagered</div><div style="text-align:right">Prize</div>
+    </div>
+    ${rows || '<div class="state-msg">No further entries for this period.</div>'}`;
+}
+
+function updateLockUI(total, errorMsg) {
+  const pct = Math.min(100, (total / CONFIG.unlockThreshold) * 100);
+  const fill = document.getElementById('lockProgressFill');
+  const label = document.getElementById('lockProgressLabel');
+  if (fill) fill.style.width = pct + '%';
+  if (label) label.textContent = errorMsg || `${formatUSD(total)} / ${formatUSD(CONFIG.unlockThreshold)} wagered`;
+}
+
+function checkUnlockStatus() {
+  // Leaderboard is open — lock bypassed.
+  updateLockUI(CONFIG.currentWagered);
+  return true;
+}
+
+function initLeaderboard() {
+  const lockOverlay = document.getElementById('lockOverlay');
+  const unlockedContent = document.getElementById('unlockedContent');
+  const unlocked = checkUnlockStatus();
+
+  if (!unlocked) {
+    lockOverlay.style.display = '';
+    unlockedContent.style.display = 'none';
+    refreshBtn.classList.remove('spinning');
+    const { start_at, end_at } = getDateRange(currentPeriod);
+    rangeLabel.textContent = `${start_at} → ${end_at}`;
+    startCountdown(currentPeriod);
+    return;
+  }
+
+  lockOverlay.style.display = 'none';
+  unlockedContent.style.display = '';
+  loadLeaderboard();
+}
+
+async function loadLeaderboard() {
+  refreshBtn.classList.add('spinning');
+  board.innerHTML = '<div class="state-msg">Loading leaderboard…</div>';
+  podiumSlot.innerHTML = '';
+
+  const { start_at, end_at } = getDateRange(currentPeriod);
+  rangeLabel.textContent = `${start_at} → ${end_at}`;
+  startCountdown(currentPeriod);
+
+  const url = `${CONFIG.baseUrl}?start_at=${start_at}&end_at=${end_at}&key=${CONFIG.apiKey}`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`API responded with status ${res.status}`);
+    }
+    const raw = await res.json();
+    const entries = normalizeEntries(raw);
+    if (!entries) {
+      renderError('Connected, but the response shape wasn\'t recognized. Check the browser console for the raw payload and adjust CONFIG.fieldMap.', raw);
+      return;
+    }
+    render(entries);
+  } catch (err) {
+    renderError(`Couldn't load leaderboard data: ${err.message}. This can happen if the endpoint path differs or the request needs to run from a server (CORS).`);
+  } finally {
+    refreshBtn.classList.remove('spinning');
+  }
+}
+
+/* ---- ambient background: glow orbs + particles ---- */
+(function buildAmbient(){
+  const container = document.getElementById('floaters');
+
+  const orbs = [
+    { size: 340, color: 'rgba(198,255,61,0.10)', top: '5%',  left: '8%',  dur: '16s' },
+    { size: 300, color: 'rgba(139,107,255,0.12)', top: '55%', left: '78%', dur: '20s' },
+    { size: 260, color: 'rgba(255,215,107,0.08)', top: '80%', left: '20%', dur: '18s' },
+    { size: 220, color: 'rgba(139,107,255,0.08)', top: '10%', left: '70%', dur: '14s' },
+  ];
+  orbs.forEach((o, i) => {
+    const el = document.createElement('div');
+    el.className = 'orb';
+    el.style.width = o.size + 'px';
+    el.style.height = o.size + 'px';
+    el.style.top = o.top;
+    el.style.left = o.left;
+    el.style.background = o.color;
+    el.style.animationDuration = o.dur;
+    el.style.animationDelay = (i * 1.5) + 's';
+    container.appendChild(el);
+  });
+
+  const count = window.innerWidth < 600 ? 16 : 30;
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    const size = 1.5 + Math.random() * 2;
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.left = (Math.random() * 100) + 'vw';
+    el.style.top = (Math.random() * 100) + 'vh';
+    el.style.animationDuration = (3 + Math.random() * 3) + 's, ' + (8 + Math.random() * 8) + 's';
+    el.style.animationDelay = (Math.random() * 5) + 's, ' + (Math.random() * 5) + 's';
+    container.appendChild(el);
+  }
+})();
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentPeriod = tab.dataset.period;
+    initLeaderboard();
+  });
+});
+
+refreshBtn.addEventListener('click', () => {
+  refreshBtn.classList.add('spinning');
+  initLeaderboard();
+});
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  const entries = window.currentEntries || [];
+  if (!q) {
+    renderTable(entries.slice(3, 25), 4);
+    return;
+  }
+  const matches = entries
+    .map((entry, idx) => ({ entry, rank: idx + 1 }))
+    .filter(({ entry }) => entry.name.toLowerCase().includes(q));
+  if (matches.length === 0) {
+    board.innerHTML = '<div class="state-msg">No users match that search.</div>';
+    return;
+  }
+  board.innerHTML = `
+    <div class="thead">
+      <div>Pos</div><div>User</div><div style="text-align:right">Wagered</div><div style="text-align:right">Prize</div>
+    </div>
+    ${matches.map(({ entry, rank }) => `
+      <div class="row">
+        <div class="rank">${rank}</div>
+        <div class="name">${entry.name}</div>
+        <div class="col-right">${formatUSD(entry.wagered)}</div>
+        <div class="col-right prize">${formatUSD(prizeForRank(rank))}</div>
+      </div>`).join('')}`;
+});
+
+document.getElementById('statPool').textContent = formatUSD(CONFIG.prizePool);
+initLeaderboard();
+</script>
+</body>
+</html>
