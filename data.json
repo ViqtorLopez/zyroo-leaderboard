@@ -1,8 +1,23 @@
 {
-  "monthlyPL": 0,
+  "monthlyPL": -2000,
   "givenAway": 0,
   "nextGiveaway": "2026-09-27T19:00:00",
-  "dailyHistory": [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  "dailyHistory": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
   "totalWagered": 0,
   "wagerThreshold": 100000
 }
