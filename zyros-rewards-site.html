@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYROS Rewards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=JetBrains+Mono:wght@500;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0714;
+    --bg-2:#140b24;
+    --panel:rgba(255,255,255,0.045);
+    --panel-hi:rgba(255,255,255,0.07);
+    --border:rgba(255,255,255,0.10);
+    --violet:#8b5cf6;
+    --violet-dim:#5b3aa8;
+    --pink:#ec4899;
+    --gold:#fbbf24;
+    --gold-hi:#fde68a;
+    --text:#f5f3ff;
+    --muted:#a99bc9;
+    --display:'Baloo 2', sans-serif;
+    --body:'Rajdhani', sans-serif;
+    --mono:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:var(--body);line-height:1.5;
+    position:relative;overflow-x:hidden;
+  }
+  .wrap{max-width:940px;margin:0 auto;padding:0 24px;position:relative;z-index:1;}
+  a{color:inherit;}
+
+  .glow-field{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;}
+  .orb-1{width:520px;height:520px;background:var(--violet);top:-180px;left:-120px;transition:transform .6s cubic-bezier(.2,.8,.2,1);}
+  .orb-2{width:460px;height:460px;background:var(--pink);top:-100px;right:-160px;opacity:.35;transition:transform .6s cubic-bezier(.2,.8,.2,1);}
+  .orb-3{width:420px;height:420px;background:var(--gold);top:520px;left:50%;transform:translateX(-50%);opacity:.16;transition:transform .6s cubic-bezier(.2,.8,.2,1);}
+
+  .stripe{
+    position:relative;z-index:1;
+    background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border);
+    font-family:var(--mono);font-size:12.5px;color:var(--muted);
+    padding:9px 0;text-align:center;
+  }
+  .stripe .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-right:7px;
+    box-shadow:0 0 6px var(--gold);animation:pulse 1.6s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+  .hero{padding:70px 0 54px;}
+  .hero-top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:40px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(150deg,var(--pink),var(--violet));
+    display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;color:#fff;font-size:17px;
+    box-shadow:0 4px 18px rgba(139,92,246,0.4);flex-shrink:0;}
+  .hero-top span{font-family:var(--body);font-weight:700;font-size:15px;color:var(--muted);letter-spacing:.03em;}
+
+  .site-nav{display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
+  .site-nav a{
+    font-family:var(--body);font-weight:600;font-size:14.5px;color:var(--muted);text-decoration:none;
+  }
+  .site-nav a:hover{color:var(--text);}
+  .site-nav a.nav-cta{
+    background:linear-gradient(135deg,var(--pink),var(--violet));color:#fff;
+    padding:8px 16px;border-radius:9px;font-weight:700;
+  }
+  .site-nav a.nav-cta:hover{color:#fff;opacity:.9;}
+
+  .headline{display:flex;align-items:center;gap:26px;flex-wrap:wrap;}
+  .big-num{
+    font-family:var(--display);font-weight:800;font-size:132px;line-height:.85;
+    background:linear-gradient(155deg, var(--gold-hi), var(--gold) 45%, var(--pink));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 8px 30px rgba(251,191,36,0.25));
+  }
+  .headline-text{font-family:var(--display);font-weight:700;font-size:33px;line-height:1.18;max-width:430px;}
+
+  .hero-desc{margin-top:24px;max-width:580px;font-size:18.5px;color:var(--muted);line-height:1.65;}
+  .hero-desc b{color:var(--text);font-weight:700;}
+
+  .cta-row{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap;}
+
+  /* ---------- countdown strip ---------- */
+  .countdown-strip{margin-top:38px;padding-top:28px;border-top:1px solid var(--border);}
+  .cd-label{font-family:var(--mono);font-size:12.5px;color:var(--muted);letter-spacing:.05em;margin-bottom:12px;}
+  .cd-nums{display:flex;gap:10px;}
+
+  .active-giveaway-link{
+    display:inline-flex;align-items:center;gap:8px;margin-top:16px;
+    font-family:var(--body);font-weight:700;font-size:14.5px;color:var(--gold-hi);
+    text-decoration:none;border-bottom:1.5px solid rgba(251,191,36,0.4);padding-bottom:2px;
+  }
+  .active-giveaway-link:hover{color:var(--gold);}
+  .dot-live{
+    width:7px;height:7px;border-radius:50%;background:#4ade80;flex-shrink:0;
+    box-shadow:0 0 6px #4ade80;animation:pulse 1.6s ease-in-out infinite;
+  }
+
+  /* ---------- stream panel ---------- */
+  .stream-panel{
+    border:1px solid var(--border);border-radius:18px;overflow:hidden;
+    background:var(--panel);backdrop-filter:blur(14px);
+  }
+  .stream-embed{position:relative;width:100%;padding-top:56.25%;background:#000;}
+  .stream-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+  .stream-footer{
+    display:flex;align-items:center;gap:10px;padding:16px 22px;
+    font-size:14.5px;color:var(--muted);border-top:1px solid var(--border);
+  }
+  .stream-btn{margin-left:auto;padding:9px 18px;font-size:14px;}
+  .cd-box{
+    background:var(--panel);border:1px solid var(--border);border-radius:10px;
+    padding:10px 16px;text-align:center;backdrop-filter:blur(10px);min-width:56px;
+  }
+  .cd-box span{display:block;font-family:var(--mono);font-weight:800;font-size:22px;
+    background:linear-gradient(155deg,var(--gold-hi),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .cd-box small{font-size:10.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;}
+
+  /* ---------- sparkline ---------- */
+  .spark-wrap{padding:20px 26px 6px;border-bottom:1px solid var(--border);}
+  .spark-top{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px;}
+  .spark{width:100%;height:70px;display:block;}
+  .btn{
+    font-family:var(--body);font-weight:700;font-size:16px;padding:14px 26px;border-radius:12px;
+    text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+    transition:transform .15s ease;
+  }
+  .btn:active{transform:scale(0.97);}
+  .btn-primary{background:linear-gradient(135deg,var(--pink),var(--violet));color:#fff;
+    box-shadow:0 8px 24px rgba(139,92,246,0.35);}
+  .btn-ghost{background:var(--panel);border:1.5px solid var(--border);color:var(--text);backdrop-filter:blur(8px);}
+
+  .section{padding:60px 0;border-top:1px solid var(--border);}
+  .section-head{margin-bottom:28px;}
+  .section-head h2{font-family:var(--display);font-weight:700;font-size:28px;margin:0 0 8px;}
+  .section-head p{margin:0;color:var(--muted);font-size:16.5px;max-width:540px;}
+
+  .ledger{
+    border:1px solid var(--border);border-radius:18px;overflow:hidden;
+    background:var(--panel);backdrop-filter:blur(14px);
+  }
+
+  .ledger-top{
+    display:flex;align-items:center;gap:36px;
+    padding:32px 30px;border-bottom:1px solid var(--border);
+    flex-wrap:wrap;
+  }
+
+  /* ---- progress ring ---- */
+  .ring-wrap{position:relative;width:160px;height:160px;flex-shrink:0;margin:0 auto;}
+  .ring-svg{width:100%;height:100%;transform:rotate(-90deg);}
+  .ring-track{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:11;}
+  .ring-fill{
+    fill:none;stroke:url(#ringGrad);stroke-width:11;stroke-linecap:round;
+    stroke-dasharray:427;stroke-dashoffset:427;
+    transition:stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1);
+  }
+  .ring-center{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;
+  }
+  .ring-center span{font-family:var(--mono);font-weight:800;font-size:27px;color:var(--gold);}
+  .ring-center small{font-size:11px;color:var(--muted);letter-spacing:.05em;margin-top:2px;}
+
+  /* ---- stat grid ---- */
+  .stat-grid{
+    flex:1;min-width:280px;
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  }
+  .stat-tile{
+    border:1px solid var(--border);border-radius:14px;padding:16px 18px;
+    background:rgba(255,255,255,0.02);
+    opacity:0;transform:translateY(10px);
+    transition:opacity .5s ease, transform .5s ease;
+  }
+  .stat-tile.in-view{opacity:1;transform:translateY(0);}
+  .stat-icon{
+    width:34px;height:34px;border-radius:9px;margin-bottom:10px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .stat-icon svg{width:19px;height:19px;}
+  .stat-tile[data-accent="violet"] .stat-icon{background:rgba(139,92,246,0.15);color:var(--violet);}
+  .stat-tile[data-accent="gold"] .stat-icon{background:rgba(251,191,36,0.15);color:var(--gold);}
+  .stat-tile[data-accent="pink"] .stat-icon{background:rgba(236,72,153,0.15);color:var(--pink);}
+  .stat-tile[data-accent="teal"] .stat-icon{background:rgba(45,212,191,0.15);color:#2dd4bf;}
+  .stat-label{font-size:13px;color:var(--muted);font-weight:600;margin-bottom:4px;}
+  .stat-value{font-family:var(--mono);font-weight:700;font-size:19px;}
+  .stat-value.gold{color:var(--gold);}
+
+  .offers{display:flex;flex-direction:column;gap:16px;}
+  .offer{
+    display:flex;align-items:center;gap:20px;
+    border:1px solid var(--border);border-radius:18px;
+    background:var(--panel);backdrop-filter:blur(14px);
+    padding:22px 26px;
+    transition:border-color .2s ease;
+  }
+  .offer-icon{
+    width:56px;height:56px;border-radius:14px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-weight:800;font-size:18px;color:#fff;
+    background:linear-gradient(150deg,var(--pink),var(--violet));
+  }
+  .offer-body h3{margin:0 0 5px;font-family:var(--display);font-size:19px;font-weight:700;}
+  .offer-body p{margin:0;color:var(--muted);font-size:15px;}
+
+  .ticket-frame{
+    margin-top:16px;display:flex;justify-content:center;
+    padding:22px;border-radius:18px;border:1px solid var(--border);
+    background:var(--panel);backdrop-filter:blur(14px);
+  }
+
+  /* ---------- lock card ---------- */
+  .lock-card{
+    border:1px solid var(--border);border-radius:18px;
+    background:var(--panel);backdrop-filter:blur(14px);
+    padding:44px 28px;text-align:center;
+  }
+  .lock-icon{font-size:36px;margin-bottom:14px;}
+  .lock-title{font-family:var(--display);font-weight:700;font-size:22px;margin-bottom:12px;}
+  .lock-desc{max-width:440px;margin:0 auto 26px;color:var(--muted);font-size:15px;line-height:1.6;}
+  .lock-desc b{color:var(--text);}
+  .lock-progress-wrap{max-width:420px;margin:0 auto 26px;}
+  .lock-progress-track{
+    height:11px;border-radius:7px;background:rgba(0,0,0,0.35);overflow:hidden;border:1px solid var(--border);
+  }
+  .lock-progress-fill{
+    height:100%;background:linear-gradient(90deg,var(--pink),var(--gold));border-radius:7px;
+    width:0%;transition:width 1.4s cubic-bezier(.2,.8,.2,1);
+  }
+  .lock-progress-label{margin-top:9px;font-family:var(--mono);font-size:13.5px;color:var(--gold);font-weight:700;}
+
+  /* ---------- bonus hunt ---------- */
+  .bh-biggest{
+    border:1px solid var(--border);border-radius:16px;background:var(--panel);backdrop-filter:blur(14px);
+    padding:20px 24px;text-align:center;margin-bottom:16px;
+  }
+  .bh-biggest-label{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:6px;}
+  .bh-biggest-slot{font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:4px;}
+  .bh-biggest-amt{font-family:var(--mono);font-size:26px;font-weight:800;color:var(--gold);}
+
+  .bh-list{border:1px solid var(--border);border-radius:16px;background:var(--panel);backdrop-filter:blur(14px);overflow:hidden;}
+  .bh-row{display:flex;justify-content:space-between;align-items:center;padding:13px 22px;border-bottom:1px solid var(--border);}
+  .bh-row:last-child{border-bottom:none;}
+  .bh-row .slot{font-weight:600;font-size:14.5px;}
+  .bh-row .amt{font-family:var(--mono);font-weight:700;font-size:14.5px;color:var(--gold);}
+  .bh-empty{padding:30px;text-align:center;color:var(--muted);font-size:14px;}
+
+  /* ---------- tournament ---------- */
+  .tour-prize{
+    text-align:center;font-family:var(--display);font-weight:800;font-size:30px;
+    background:linear-gradient(155deg, var(--gold-hi), var(--gold), var(--pink));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    margin-bottom:20px;
+  }
+  .tour-list{border:1px solid var(--border);border-radius:16px;background:var(--panel);backdrop-filter:blur(14px);overflow:hidden;}
+  .tour-row{display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid var(--border);}
+  .tour-row:last-child{border-bottom:none;}
+  .tour-rank{
+    font-family:var(--mono);font-weight:800;font-size:14px;width:30px;height:30px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;
+    background:rgba(255,255,255,0.06);
+  }
+  .tour-row.top1 .tour-rank{background:linear-gradient(150deg,#ffe38a,var(--gold));color:#1a1200;}
+  .tour-row.top2 .tour-rank{background:linear-gradient(150deg,#e6e9ee,#aab2bd);color:#1a1200;}
+  .tour-row.top3 .tour-rank{background:linear-gradient(150deg,#e3a25f,#b9723a);color:#1a1200;}
+  .tour-user{flex:1;font-weight:600;font-size:14.5px;}
+  .tour-wagered{font-family:var(--mono);font-weight:700;font-size:14.5px;color:var(--gold);}
+  .tour-empty{padding:30px;text-align:center;color:var(--muted);font-size:14px;}
+
+  .steps{display:flex;flex-direction:column;gap:0;}
+  .step{display:flex;gap:22px;padding:22px 0;border-bottom:1px solid var(--border);}
+  .step:last-child{border-bottom:none;}
+  .step-num{
+    font-family:var(--mono);font-weight:800;font-size:14px;
+    width:34px;height:34px;border-radius:10px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(150deg, rgba(236,72,153,0.18), rgba(139,92,246,0.18));
+    border:1px solid var(--border);color:var(--gold);
+  }
+  .step h3{margin:0 0 5px;font-family:var(--display);font-size:18px;font-weight:700;}
+  .step p{margin:0;color:var(--muted);font-size:15.5px;max-width:490px;}
+
+  footer{padding:44px 0 60px;border-top:1px solid var(--border);}
+  .foot-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  .foot-links{display:flex;gap:22px;font-size:15px;color:var(--muted);}
+  .foot-links a:hover{color:var(--gold);}
+  .foot-note{font-size:13px;color:var(--muted);margin-top:20px;opacity:.7;}
+
+  /* ---------- money rain ---------- */
+  .money-rain{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden;}
+  .bill{
+    position:absolute;top:-80px;
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,0.35));
+    animation-name:billFall;
+    animation-timing-function:cubic-bezier(.4,0,.6,1);
+    animation-fill-mode:forwards;
+  }
+  @keyframes billFall{
+    0%{transform:translateY(0) translateX(0) rotate(0deg);opacity:0;}
+    5%{opacity:1;}
+    100%{transform:translateY(calc(100vh + 120px)) translateX(var(--drift)) rotate(var(--spin));opacity:1;}
+  }
+
+  @media (max-width:640px){
+    .big-num{font-size:88px;}
+    .headline-text{font-size:25px;}
+    .ledger-row{padding:16px 20px;}
+    .ledger-value{font-size:19px;}
+    .offer{padding:18px 20px;}
+    .site-nav{gap:14px;font-size:13.5px;}
+    .site-nav a{font-size:13.5px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="money-rain" id="moneyRain"></div>
+
+<div class="glow-field">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<div class="stripe"><span class="dot"></span>LIVE ON STAKE &middot; LEDGER UPDATED DAILY</div>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="hero-top">
+      <div class="brand"><div class="mark">Z</div><span>ZYROS Rewards</span></div>
+      <nav class="site-nav">
+        <a href="#ledger">Ledger</a>
+        <a href="#live">Live</a>
+        <a href="#leaderboard">Leaderboard</a>
+        <a href="games.html">Games</a>
+        <a href="https://discord.gg/AztFxHBhD" target="_blank" rel="noopener">Discord</a>
+        <a class="nav-cta" href="https://stake.com/?c=zyros" target="_blank" rel="noopener">Sign up</a>
+      </nav>
+    </div>
+
+    <div class="headline">
+      <div class="big-num">5%</div>
+      <div class="headline-text">of everything I win on Stake comes straight back to you.</div>
+    </div>
+
+    <p class="hero-desc">
+      No leaderboard gimmick, no fine print. Every day I finish up, <b>5% of that day's profit</b>
+      goes into a community pool &mdash; and I update the numbers below myself, by hand, every day.
+    </p>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://stake.com/?c=zyros" target="_blank" rel="noopener">Sign up on Stake</a>
+      <a class="btn btn-ghost" href="#ledger">See the ledger</a>
+    </div>
+
+    <div class="countdown-strip">
+      <div class="cd-label">Next $500 giveaway drops in</div>
+      <div class="cd-nums">
+        <div class="cd-box"><span id="cdD">00</span><small>days</small></div>
+        <div class="cd-box"><span id="cdH">00</span><small>hrs</small></div>
+        <div class="cd-box"><span id="cdM">00</span><small>min</small></div>
+        <div class="cd-box"><span id="cdS">00</span><small>sec</small></div>
+      </div>
+      <a class="active-giveaway-link" href="https://x.com/ZyrosLive/status/2099311489362334146?s=20" target="_blank" rel="noopener">
+        <span class="dot-live"></span> There's an active giveaway right now &mdash; enter it here
+      </a>
+    </div>
+  </section>
+
+  <section class="section" id="live">
+    <div class="section-head">
+      <h2>Watch live</h2>
+      <p>Catch every session as it happens &mdash; wins, losses, no editing.</p>
+    </div>
+
+    <div class="stream-panel">
+      <div class="stream-embed">
+        <iframe src="https://player.kick.com/zyrostv" frameborder="0" allowfullscreen title="ZYROS Kick Livestream"></iframe>
+      </div>
+      <div class="stream-footer">
+        <span class="dot-live"></span>
+        <span>Live on Kick</span>
+        <a class="btn btn-ghost stream-btn" href="https://kick.com/zyrostv" target="_blank" rel="noopener">Watch on Kick</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="ledger">
+    <div class="section-head">
+      <h2>The ledger</h2>
+      <p>Every number here is real and updated by hand at the end of each day I play.</p>
+    </div>
+
+    <div class="ledger">
+
+      <div class="ledger-top">
+        <div class="ring-wrap">
+          <svg class="ring-svg" viewBox="0 0 160 160">
+            <defs>
+              <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ec4899"/>
+                <stop offset="100%" stop-color="#fbbf24"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-track" cx="80" cy="80" r="68"/>
+            <circle class="ring-fill" id="ringFill" cx="80" cy="80" r="68"/>
+          </svg>
+          <div class="ring-center">
+            <span id="ringPct">0%</span>
+            <small>pool paid out</small>
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-tile" data-accent="violet">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M3 7h15a3 3 0 0 1 3 3v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.8"/><path d="M3 7l2-3h11l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="16.5" cy="13.5" r="1.6" fill="currentColor"/></svg>
+            </div>
+            <div class="stat-label">Monthly P&amp;L</div>
+            <div class="stat-value" id="valPL">$0</div>
+          </div>
+
+          <div class="stat-tile" data-accent="gold">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 3a9 9 0 0 1 9 9h-9Z" fill="currentColor" opacity="0.85"/></svg>
+            </div>
+            <div class="stat-label">5% committed</div>
+            <div class="stat-value gold" id="valCommitted">$0</div>
+          </div>
+
+          <div class="stat-tile" data-accent="pink">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="18" height="10" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.8"/><path d="M12 10v10" stroke="currentColor" stroke-width="1.8"/><path d="M12 10c-2-4-7-4-7-1s5 1 7 1Z" stroke="currentColor" stroke-width="1.6"/><path d="M12 10c2-4 7-4 7-1s-5 1-7 1Z" stroke="currentColor" stroke-width="1.6"/></svg>
+            </div>
+            <div class="stat-label">Given away</div>
+            <div class="stat-value" id="valGiven">$0</div>
+          </div>
+
+          <div class="stat-tile" data-accent="teal">
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="7" rx="7" ry="3" stroke="currentColor" stroke-width="1.8"/><path d="M5 7v5c0 1.66 3.13 3 7 3s7-1.34 7-3V7" stroke="currentColor" stroke-width="1.8"/><path d="M5 12v5c0 1.66 3.13 3 7 3s7-1.34 7-3v-5" stroke="currentColor" stroke-width="1.8"/></svg>
+            </div>
+            <div class="stat-label">Still in pool</div>
+            <div class="stat-value" id="valRemaining">$0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spark-wrap">
+        <div class="spark-top"><span>Daily contribution, last 14 days</span></div>
+        <svg class="spark" id="sparkSvg" viewBox="0 0 560 90" preserveAspectRatio="none"></svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>Active offers</h2>
+      <p>Everything currently running if you sign up under code ZYROS.</p>
+    </div>
+
+    <div class="offers">
+      <div class="offer">
+        <div class="offer-icon">5%</div>
+        <div class="offer-body">
+          <h3>The 5% Promise</h3>
+          <p>5% of my daily profit goes into the community pool &mdash; tracked in the ledger above.</p>
+        </div>
+      </div>
+      <div class="offer">
+        <div class="offer-icon">10%</div>
+        <div class="offer-body">
+          <h3>Deposit bonus, up to $100</h3>
+          <p>Sign up with code ZYROS and get 10% back on your first deposit.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="leaderboard">
+    <div class="section-head">
+      <h2>Community leaderboard</h2>
+      <p>Unlocks once the community wagers enough on code ZYROS together.</p>
+    </div>
+
+    <div class="lock-card" id="lockCard">
+      <div class="lock-icon">🔒</div>
+      <div class="lock-title">Leaderboard locked</div>
+      <p class="lock-desc">The leaderboard unlocks once the community wagers <b id="lockThreshold">$100,000</b> total on code ZYROS. Keep playing to help unlock it!</p>
+
+      <div class="lock-progress-wrap">
+        <div class="lock-progress-track"><div class="lock-progress-fill" id="lockProgressFill"></div></div>
+        <div class="lock-progress-label"><span id="wageredAmt">$0</span> / <span id="thresholdAmt">$100,000</span> wagered</div>
+      </div>
+
+      <a class="btn btn-primary" href="https://stake.com/?c=zyros" target="_blank" rel="noopener">Play now</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>How the pool works</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div><h3>I play live on Stake</h3><p>Wins and losses, no editing. Catch it live on stream.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div><h3>5% locks in at the end of the day</h3><p>Any day I finish up, 5% of that profit moves into the community pool.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div><h3>The pool pays out</h3><p>Bi-weekly $500 giveaways, plus Discord drops and surprise giveaways in between.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot-row">
+      <div class="mark" style="width:32px;height:32px;font-size:14px;">Z</div>
+      <div class="foot-links">
+        <a href="https://stake.com/?c=zyros" target="_blank" rel="noopener">Sign up</a>
+        <a href="https://discord.gg/AztFxHBhD" target="_blank" rel="noopener">Discord</a>
+      </div>
+    </div>
+    <div class="foot-note">ZYROS Rewards &middot; in partnership with Stake.com</div>
+  </footer>
+
+</div>
+
+<script>
+const DEFAULT_DATA = {
+  monthlyPL: 0,
+  givenAway: 0,
+  nextGiveaway: '2026-09-27T19:00:00',
+  dailyHistory: [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  totalWagered: 0,
+  wagerThreshold: 100000,
+  bonusHunt: { start:0, bonusCount:0, bonusTarget:0, avgMultiplier:0, breakEven:0, biggestWinSlot:'', biggestWinAmount:0, bonusList:'' },
+  tournament: { title:'Monthly race', prizePool:0, endDate:'2026-10-01T00:00:00', standingsList:'' },
+};
+
+function formatUSD(n){
+  const sign = n < 0 ? '-' : '';
+  return sign + '$' + Math.abs(n).toLocaleString('en-US', {maximumFractionDigits:0});
+}
+
+function animateCount(el, target){
+  const dur = 900;
+  const start = performance.now();
+  function frame(now){
+    const p = Math.min(1, (now - start) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const val = Math.round(target * eased);
+    el.textContent = formatUSD(val);
+    if(p < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- load data.json, then wire up everything that depends on it ---------- */
+fetch('./data.json?t=' + Date.now())
+  .then(res => { if(!res.ok) throw new Error('bad response'); return res.json(); })
+  .then(data => initSite(data))
+  .catch(() => initSite(DEFAULT_DATA));
+
+function initSite(CONFIG){
+  const committed = Math.max(0, Math.round(CONFIG.monthlyPL * 0.05));
+  const remaining = Math.max(0, committed - CONFIG.givenAway);
+  const pct = committed > 0 ? Math.min(100, Math.round((CONFIG.givenAway / committed) * 100)) : 0;
+
+  /* ---------- locked leaderboard ---------- */
+  (function updateLockCard(){
+    const wagered = CONFIG.totalWagered || 0;
+    const threshold = CONFIG.wagerThreshold || 100000;
+    const wagerPct = Math.min(100, Math.round((wagered / threshold) * 100));
+
+    document.getElementById('wageredAmt').textContent = formatUSD(wagered);
+    document.getElementById('thresholdAmt').textContent = formatUSD(threshold);
+    document.getElementById('lockThreshold').textContent = formatUSD(threshold);
+    requestAnimationFrame(()=>{
+      document.getElementById('lockProgressFill').style.width = wagerPct + '%';
+    });
+
+    if(wagered >= threshold){
+      const card = document.getElementById('lockCard');
+      card.querySelector('.lock-icon').textContent = '🔓';
+      card.querySelector('.lock-title').textContent = 'Leaderboard unlocked!';
+      card.querySelector('.lock-desc').innerHTML = 'The community hit the goal &mdash; thanks for playing your part.';
+    }
+  })();
+
+  /* ---------- ledger reveal: triggers on scroll into view ---------- */
+  const ledgerEl = document.getElementById('ledger');
+  const statTiles = document.querySelectorAll('.stat-tile');
+  let ledgerAnimated = false;
+
+  function playLedgerReveal(){
+    if(ledgerAnimated) return;
+    ledgerAnimated = true;
+
+    animateCount(document.getElementById('valPL'), CONFIG.monthlyPL);
+    animateCount(document.getElementById('valCommitted'), committed);
+    animateCount(document.getElementById('valGiven'), CONFIG.givenAway);
+    animateCount(document.getElementById('valRemaining'), remaining);
+
+    statTiles.forEach((tile, i)=>{
+      setTimeout(()=> tile.classList.add('in-view'), i * 90);
+    });
+
+    document.getElementById('ringPct').textContent = pct + '%';
+    const circumference = 2 * Math.PI * 68;
+    const offset = circumference * (1 - pct / 100);
+    requestAnimationFrame(()=>{
+      document.getElementById('ringFill').style.strokeDashoffset = offset;
+    });
+  }
+
+  const ledgerObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting) playLedgerReveal();
+    });
+  }, { threshold: 0.3 });
+  if(ledgerEl) ledgerObserver.observe(ledgerEl);
+
+  /* ---------- countdown timer ---------- */
+  function updateCountdown(){
+    const target = new Date(CONFIG.nextGiveaway).getTime();
+    const now = Date.now();
+    const diff = Math.max(0, target - now);
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cdD').textContent = String(d).padStart(2,'0');
+    document.getElementById('cdH').textContent = String(h).padStart(2,'0');
+    document.getElementById('cdM').textContent = String(m).padStart(2,'0');
+    document.getElementById('cdS').textContent = String(s).padStart(2,'0');
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  /* ---------- sparkline chart ---------- */
+  (function drawSparkline(){
+    const data = CONFIG.dailyHistory;
+    const svg = document.getElementById('sparkSvg');
+    const w = 560, h = 90, pad = 6;
+    const max = Math.max(1, ...data);
+    const stepX = (w - pad*2) / (data.length - 1);
+    const points = data.map((v,i)=>{
+      const x = pad + i*stepX;
+      const y = h - pad - (v/max)*(h - pad*2);
+      return [x,y];
+    });
+    const linePath = points.map((p,i)=> (i===0?'M':'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+    const areaPath = linePath + ` L${points[points.length-1][0].toFixed(1)},${h-pad} L${points[0][0].toFixed(1)},${h-pad} Z`;
+
+    const ns = 'http://www.w3.org/2000/svg';
+    const defs = document.createElementNS(ns,'defs');
+    defs.innerHTML = `<linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>
+    </linearGradient>`;
+    svg.appendChild(defs);
+
+    const area = document.createElementNS(ns,'path');
+    area.setAttribute('d', areaPath);
+    area.setAttribute('fill', 'url(#sparkFill)');
+    svg.appendChild(area);
+
+    const line = document.createElementNS(ns,'path');
+    line.setAttribute('d', linePath);
+    line.setAttribute('fill', 'none');
+    line.setAttribute('stroke', '#fbbf24');
+    line.setAttribute('stroke-width', '2.5');
+    line.setAttribute('stroke-linecap', 'round');
+    line.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(line);
+
+    points.forEach((p, i)=>{
+      if(i === points.length - 1){
+        const dot = document.createElementNS(ns,'circle');
+        dot.setAttribute('cx', p[0]); dot.setAttribute('cy', p[1]); dot.setAttribute('r', 4);
+        dot.setAttribute('fill', '#fbbf24');
+        svg.appendChild(dot);
+      }
+    });
+  })();
+}
+
+/* ---------- mouse-reactive hero glow (subtle parallax) ---------- */
+(function heroParallax(){
+  const orbs = [document.querySelector('.orb-1'), document.querySelector('.orb-2'), document.querySelector('.orb-3')];
+  const strength = [18, 14, 10];
+  window.addEventListener('mousemove', (e)=>{
+    const cx = (e.clientX / window.innerWidth) - 0.5;
+    const cy = (e.clientY / window.innerHeight) - 0.5;
+    orbs.forEach((orb, i)=>{
+      if(!orb) return;
+      const baseTransform = i === 2 ? 'translateX(-50%)' : '';
+      orb.style.transform = `${baseTransform} translate(${cx*strength[i]}px, ${cy*strength[i]}px)`;
+    });
+  });
+})();
+
+/* ---------- money rain (plays once, shortly after load) ---------- */
+(function moneyRain(){
+  const container = document.getElementById('moneyRain');
+  if(!container) return;
+
+  const billSVG = `
+    <svg width="52" height="26" viewBox="0 0 104 52" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="1" width="102" height="50" rx="4" fill="#2f6b3f" stroke="#c9a24a" stroke-width="1.4"/>
+      <rect x="6" y="6" width="92" height="40" rx="2" fill="none" stroke="#8fbf9a" stroke-width="0.8" opacity="0.7"/>
+      <circle cx="52" cy="26" r="14" fill="#22502e" stroke="#c9a24a" stroke-width="1"/>
+      <text x="52" y="32" font-family="Georgia, serif" font-size="16" fill="#e7d9a8" text-anchor="middle">$</text>
+      <text x="16" y="17" font-family="Georgia, serif" font-size="8" fill="#c9dfc7" opacity="0.85">100</text>
+      <text x="88" y="41" font-family="Georgia, serif" font-size="8" fill="#c9dfc7" opacity="0.85" text-anchor="end">100</text>
+    </svg>`;
+
+  function spawnBill(delay){
+    const wrap = document.createElement('div');
+    wrap.className = 'bill';
+    wrap.innerHTML = billSVG;
+
+    const startX = Math.random() * 100;
+    const drift = (Math.random() * 160 - 80).toFixed(0) + 'px';
+    const spin = (Math.random() * 520 - 260).toFixed(0) + 'deg';
+    const duration = 3.4 + Math.random() * 2.2;
+    const scale = 0.7 + Math.random() * 0.7;
+
+    wrap.style.left = startX + 'vw';
+    wrap.style.setProperty('--drift', drift);
+    wrap.style.setProperty('--spin', spin);
+    wrap.style.animationDuration = duration + 's';
+    wrap.style.animationDelay = delay + 's';
+    wrap.style.transform = `scale(${scale})`;
+
+    container.appendChild(wrap);
+    setTimeout(()=> wrap.remove(), (delay + duration + 0.5) * 1000);
+  }
+
+    function playMoneyRain(){
+    const count = 42;
+    for(let i = 0; i < count; i++){
+      spawnBill(Math.random() * 1.4);
+    }
+  }
+
+  setTimeout(playMoneyRain, 900);
+})();
+</script>
+</body>
+</html>

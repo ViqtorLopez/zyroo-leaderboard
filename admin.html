@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYROS Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=JetBrains+Mono:wght@500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0714; --panel:#150f24; --border:rgba(255,255,255,0.10);
+    --violet:#8b5cf6; --pink:#ec4899; --gold:#fbbf24;
+    --text:#f5f3ff; --muted:#a99bc9; --danger:#f87171; --success:#4ade80;
+    --display:'Baloo 2', sans-serif; --body:'Rajdhani', sans-serif; --mono:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);padding:40px 20px;line-height:1.5;}
+  .wrap{max-width:640px;margin:0 auto;}
+
+  .gate{
+    position:fixed;inset:0;background:var(--bg);
+    display:flex;align-items:center;justify-content:center;z-index:100;
+  }
+  .gate-box{
+    width:100%;max-width:340px;padding:0 20px;text-align:center;
+  }
+  .gate-box input{margin-bottom:4px;text-align:center;}
+  .gate .status{display:none;}
+  .gate .status.show{display:block;}
+  .gate .btn-row{justify-content:center;}
+  h1{font-family:var(--display);font-size:26px;margin:0 0 6px;}
+  .sub{color:var(--muted);font-size:15px;margin:0 0 30px;}
+
+  .card{
+    background:var(--panel);border:1px solid var(--border);border-radius:16px;
+    padding:24px;margin-bottom:20px;
+  }
+  .card h2{font-family:var(--display);font-size:17px;margin:0 0 14px;}
+
+  label{display:block;font-size:13.5px;color:var(--muted);font-weight:600;margin:14px 0 6px;}
+  label:first-of-type{margin-top:0;}
+  input, textarea{
+    width:100%;background:#0d0817;border:1px solid var(--border);color:var(--text);
+    border-radius:9px;padding:10px 12px;font-family:var(--mono);font-size:14px;
+  }
+  textarea{resize:vertical;min-height:60px;}
+  input:focus, textarea:focus{outline:none;border-color:var(--violet);}
+
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14.5px;
+    padding:11px 20px;border-radius:10px;border:none;cursor:pointer;font-family:var(--body);
+  }
+  .btn-primary{background:linear-gradient(135deg,var(--pink),var(--violet));color:#fff;}
+  .btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--text);}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+  .btn-row{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
+
+  .status{margin-top:14px;font-size:14px;padding:10px 14px;border-radius:8px;display:none;}
+  .status.show{display:block;}
+  .status.ok{background:rgba(74,222,128,0.12);color:var(--success);border:1px solid rgba(74,222,128,0.3);}
+  .status.err{background:rgba(248,113,113,0.12);color:var(--danger);border:1px solid rgba(248,113,113,0.3);}
+  .status.info{background:rgba(139,92,246,0.12);color:#c4b5fd;border:1px solid rgba(139,92,246,0.3);}
+
+  .warn{
+    background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.3);border-radius:10px;
+    padding:14px 16px;font-size:13.5px;color:#fde68a;margin-bottom:20px;line-height:1.6;
+  }
+  .warn a{color:#fff;}
+
+  .hist-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:6px;}
+  .hist-grid input{padding:8px 6px;text-align:center;font-size:12.5px;}
+  .hist-day-label{font-size:9.5px;color:var(--muted);text-align:center;margin-bottom:3px;}
+
+  .remember-row{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--muted);}
+  .remember-row input[type="checkbox"]{width:auto;}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="gate-box">
+    <h1 style="font-size:20px;">ZYROS Admin</h1>
+    <p class="sub" style="margin-bottom:20px;">Enter the password to continue.</p>
+    <input type="password" id="gatePassword" placeholder="Password" autofocus>
+    <div class="status err" id="gateError" style="margin-top:10px;">Wrong password. Try again.</div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="gateSubmit">Enter</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="adminWrap" style="display:none;">
+  <h1>ZYROS Rewards &mdash; Admin</h1>
+  <p class="sub">Update the live site's numbers directly. Changes go live within a minute or two of GitHub Pages rebuilding.</p>
+
+  <div class="warn">
+    ⚠️ You'll need a GitHub <b>fine-grained personal access token</b> scoped ONLY to this one repository, with <b>Contents: Read and write</b> permission. Don't use a broad/classic token here &mdash; anyone who gets this token could edit your repo. Create one at
+    <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.
+    This token is only stored in your browser (optionally), never sent anywhere except GitHub's own API.
+  </div>
+
+  <div class="card">
+    <h2>Connection</h2>
+    <label>GitHub Personal Access Token</label>
+    <input type="password" id="token" placeholder="github_pat_...">
+
+    <div class="row">
+      <div>
+        <label>Repo owner (username)</label>
+        <input type="text" id="owner" value="ViqtorLopez">
+      </div>
+      <div>
+        <label>Repo name</label>
+        <input type="text" id="repo" value="zyroo-leaderboard">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Branch</label>
+        <input type="text" id="branch" value="main">
+      </div>
+      <div>
+        <label>File path</label>
+        <input type="text" id="path" value="data.json">
+      </div>
+    </div>
+
+    <div class="remember-row">
+      <input type="checkbox" id="remember">
+      <label for="remember" style="margin:0;">Remember these settings (not the token) on this device</label>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="loadBtn">Load current data</button>
+    </div>
+    <div class="status" id="loadStatus"></div>
+  </div>
+
+  <div class="card">
+    <h2>The numbers</h2>
+
+    <div class="row">
+      <div>
+        <label>Monthly P&amp;L ($)</label>
+        <input type="number" id="monthlyPL" value="0">
+      </div>
+      <div>
+        <label>Given away already ($)</label>
+        <input type="number" id="givenAway" value="0">
+      </div>
+    </div>
+
+    <label>Next giveaway date &amp; time</label>
+    <input type="datetime-local" id="nextGiveaway">
+
+    <label>Daily history &mdash; last 14 days ($ committed each day, oldest first)</label>
+    <div class="hist-grid" id="histGrid"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="shiftBtn" type="button">Shift in a new day &rarr;</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Community leaderboard lock</h2>
+    <div class="row">
+      <div>
+        <label>Total wagered so far ($)</label>
+        <input type="number" id="totalWagered" value="0">
+      </div>
+      <div>
+        <label>Unlock threshold ($)</label>
+        <input type="number" id="wagerThreshold" value="100000">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Bonus hunt</h2>
+    <div class="row3">
+      <div>
+        <label>Start balance ($)</label>
+        <input type="number" id="bhStart" value="0">
+      </div>
+      <div>
+        <label>Bonuses opened</label>
+        <input type="number" id="bhCount" value="0">
+      </div>
+      <div>
+        <label>Bonus target</label>
+        <input type="number" id="bhTarget" value="0">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Average multiplier</label>
+        <input type="number" id="bhAvgMult" value="0">
+      </div>
+      <div>
+        <label>Break even multiplier</label>
+        <input type="number" id="bhBreakEven" value="0">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Biggest win &mdash; slot name</label>
+        <input type="text" id="bhBiggestSlot" value="">
+      </div>
+      <div>
+        <label>Biggest win &mdash; amount ($)</label>
+        <input type="number" id="bhBiggestAmt" value="0">
+      </div>
+    </div>
+    <label>Bonus list &mdash; one per line, format: Slot Name | Amount</label>
+    <textarea id="bhList" rows="6" placeholder="Chicken House | 14336&#10;Puffer Stacks | 288"></textarea>
+  </div>
+
+  <div class="card">
+    <h2>Tournament / race</h2>
+    <div class="row">
+      <div>
+        <label>Title</label>
+        <input type="text" id="tourTitle" value="Monthly Race">
+      </div>
+      <div>
+        <label>Prize pool ($)</label>
+        <input type="number" id="tourPrize" value="0">
+      </div>
+    </div>
+    <label>Standings &mdash; one per line, format: Username | Wagered</label>
+    <textarea id="tourList" rows="6" placeholder="zyrostv | 120000&#10;player2 | 95000"></textarea>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="saveBtn">Save to live site</button>
+  </div>
+  <div class="status" id="saveStatus"></div>
+</div>
+
+<script>
+/* ============================================================
+   PASSWORD GATE — this is a deterrent, NOT real security.
+   Anyone who views this page's source can read the password below.
+   Real protection comes from needing a valid GitHub token to save anything.
+   Change 'zyros2026' to whatever you want.
+   ============================================================ */
+const GATE_PASSWORD = 'zyros2026';
+
+const gate = document.getElementById('gate');
+const adminWrap = document.getElementById('adminWrap');
+
+if (sessionStorage.getItem('zyrosGateUnlocked') === 'true') {
+  gate.style.display = 'none';
+  adminWrap.style.display = '';
+}
+
+document.getElementById('gateSubmit').addEventListener('click', unlockGate);
+document.getElementById('gatePassword').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') unlockGate();
+});
+
+function unlockGate(){
+  const input = document.getElementById('gatePassword').value;
+  if(input === GATE_PASSWORD){
+    sessionStorage.setItem('zyrosGateUnlocked', 'true');
+    gate.style.display = 'none';
+    adminWrap.style.display = '';
+  } else {
+    document.getElementById('gateError').classList.add('show');
+  }
+}
+
+const $ = id => document.getElementById(id);
+const histGrid = $('histGrid');
+
+function buildHistInputs(values){
+  histGrid.innerHTML = '';
+  values.forEach((v, i)=>{
+    const wrap = document.createElement('div');
+    const daysAgo = 14 - i;
+    wrap.innerHTML = `<div class="hist-day-label">${daysAgo === 1 ? 'Today' : '-' + (daysAgo-1) + 'd'}</div>
+      <input type="number" value="${v}" data-hist-index="${i}">`;
+    histGrid.appendChild(wrap);
+  });
+}
+buildHistInputs([0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+
+function getHistValues(){
+  return Array.from(histGrid.querySelectorAll('input')).map(inp => Number(inp.value) || 0);
+}
+
+function showStatus(el, msg, type){
+  el.textContent = msg;
+  el.className = 'status show ' + type;
+}
+
+function ghHeaders(token){
+  return {
+    'Authorization': 'Bearer ' + token,
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  };
+}
+
+function apiUrl(){
+  const owner = $('owner').value.trim();
+  const repo = $('repo').value.trim();
+  const path = $('path').value.trim();
+  return `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+}
+
+let currentSha = null;
+
+$('loadBtn').addEventListener('click', async ()=>{
+  const token = $('token').value.trim();
+  if(!token){ showStatus($('loadStatus'), 'Enter your GitHub token first.', 'err'); return; }
+
+  showStatus($('loadStatus'), 'Loading current data…', 'info');
+  try {
+    const branch = $('branch').value.trim();
+    const res = await fetch(apiUrl() + '?ref=' + branch, { headers: ghHeaders(token) });
+    if(!res.ok){
+      const body = await res.json().catch(()=>({}));
+      throw new Error(body.message || ('HTTP ' + res.status));
+    }
+    const json = await res.json();
+    currentSha = json.sha;
+    const content = JSON.parse(atob(json.content));
+
+    $('monthlyPL').value = content.monthlyPL ?? 0;
+    $('givenAway').value = content.givenAway ?? 0;
+    $('totalWagered').value = content.totalWagered ?? 0;
+    $('wagerThreshold').value = content.wagerThreshold ?? 100000;
+    if(content.nextGiveaway){
+      $('nextGiveaway').value = content.nextGiveaway.slice(0,16);
+    }
+    buildHistInputs(content.dailyHistory && content.dailyHistory.length === 14 ? content.dailyHistory : [0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+
+    const bh = content.bonusHunt || {};
+    $('bhStart').value = bh.start ?? 0;
+    $('bhCount').value = bh.bonusCount ?? 0;
+    $('bhTarget').value = bh.bonusTarget ?? 0;
+    $('bhAvgMult').value = bh.avgMultiplier ?? 0;
+    $('bhBreakEven').value = bh.breakEven ?? 0;
+    $('bhBiggestSlot').value = bh.biggestWinSlot ?? '';
+    $('bhBiggestAmt').value = bh.biggestWinAmount ?? 0;
+    $('bhList').value = bh.bonusList ?? '';
+
+    const tour = content.tournament || {};
+    $('tourTitle').value = tour.title ?? 'Monthly Race';
+    $('tourPrize').value = tour.prizePool ?? 0;
+    $('tourList').value = tour.standingsList ?? '';
+
+    showStatus($('loadStatus'), 'Loaded current live data successfully.', 'ok');
+  } catch(err){
+    showStatus($('loadStatus'), 'Could not load: ' + err.message, 'err');
+  }
+});
+
+$('shiftBtn').addEventListener('click', ()=>{
+  const vals = getHistValues();
+  vals.shift();
+  vals.push(Number($('monthlyPL').value) * 0.05 || 0);
+  buildHistInputs(vals.map(v => Math.round(v)));
+});
+
+$('saveBtn').addEventListener('click', async ()=>{
+  const token = $('token').value.trim();
+  if(!token){ showStatus($('saveStatus'), 'Enter your GitHub token first.', 'err'); return; }
+  if(!currentSha){ showStatus($('saveStatus'), 'Click "Load current data" first so changes are based on the latest version.', 'err'); return; }
+
+  const data = {
+    monthlyPL: Number($('monthlyPL').value) || 0,
+    givenAway: Number($('givenAway').value) || 0,
+    nextGiveaway: $('nextGiveaway').value ? $('nextGiveaway').value + ':00' : '',
+    dailyHistory: getHistValues(),
+    totalWagered: Number($('totalWagered').value) || 0,
+    wagerThreshold: Number($('wagerThreshold').value) || 100000,
+    bonusHunt: {
+      start: Number($('bhStart').value) || 0,
+      bonusCount: Number($('bhCount').value) || 0,
+      bonusTarget: Number($('bhTarget').value) || 0,
+      avgMultiplier: Number($('bhAvgMult').value) || 0,
+      breakEven: Number($('bhBreakEven').value) || 0,
+      biggestWinSlot: $('bhBiggestSlot').value || '',
+      biggestWinAmount: Number($('bhBiggestAmt').value) || 0,
+      bonusList: $('bhList').value || '',
+    },
+    tournament: {
+      title: $('tourTitle').value || 'Monthly Race',
+      prizePool: Number($('tourPrize').value) || 0,
+      endDate: '2026-10-01T00:00:00',
+      standingsList: $('tourList').value || '',
+    },
+  };
+
+  showStatus($('saveStatus'), 'Saving…', 'info');
+  try {
+    const branch = $('branch').value.trim();
+    const contentEncoded = btoa(JSON.stringify(data, null, 2));
+    const res = await fetch(apiUrl(), {
+      method: 'PUT',
+      headers: { ...ghHeaders(token), 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'Update site data via admin panel',
+        content: contentEncoded,
+        sha: currentSha,
+        branch: branch
+      })
+    });
+    if(!res.ok){
+      const body = await res.json().catch(()=>({}));
+      throw new Error(body.message || ('HTTP ' + res.status));
+    }
+    const json = await res.json();
+    currentSha = json.content.sha;
+    showStatus($('saveStatus'), 'Saved! The live site will update within a minute or two.', 'ok');
+  } catch(err){
+    showStatus($('saveStatus'), 'Save failed: ' + err.message, 'err');
+  }
+});
+
+/* ---- remember non-sensitive settings ---- */
+const REMEMBER_KEY = 'zyrosAdminSettings';
+const savedSettings = localStorage.getItem(REMEMBER_KEY);
+if(savedSettings){
+  try {
+    const s = JSON.parse(savedSettings);
+    if(s.owner) $('owner').value = s.owner;
+    if(s.repo) $('repo').value = s.repo;
+    if(s.branch) $('branch').value = s.branch;
+    if(s.path) $('path').value = s.path;
+    $('remember').checked = true;
+  } catch(e){}
+}
+
+function persistIfChecked(){
+  if($('remember').checked){
+    localStorage.setItem(REMEMBER_KEY, JSON.stringify({
+      owner: $('owner').value, repo: $('repo').value,
+      branch: $('branch').value, path: $('path').value
+    }));
+  } else {
+    localStorage.removeItem(REMEMBER_KEY);
+  }
+}
+['owner','repo','branch','path','remember'].forEach(id=>{
+  $(id).addEventListener('change', persistIfChecked);
+});
+</script>
+</body>
+</html>

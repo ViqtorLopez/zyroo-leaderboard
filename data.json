@@ -1,0 +1,24 @@
+{
+  "monthlyPL": 0,
+  "givenAway": 0,
+  "nextGiveaway": "2026-09-27T19:00:00",
+  "dailyHistory": [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  "totalWagered": 0,
+  "wagerThreshold": 100000,
+  "bonusHunt": {
+    "start": 0,
+    "bonusCount": 0,
+    "bonusTarget": 0,
+    "avgMultiplier": 0,
+    "breakEven": 0,
+    "biggestWinSlot": "",
+    "biggestWinAmount": 0,
+    "bonusList": ""
+  },
+  "tournament": {
+    "title": "Monthly Race",
+    "prizePool": 0,
+    "endDate": "2026-10-01T00:00:00",
+    "standingsList": ""
+  }
+}
