@@ -22,13 +22,8 @@
   "wagerThreshold": 100000,
   "bonusHunt": {
     "start": 0,
-    "bonusCount": 0,
     "bonusTarget": 0,
-    "avgMultiplier": 0,
-    "breakEven": 0,
-    "biggestWinSlot": "",
-    "biggestWinAmount": 0,
-    "bonusList": ""
+    "bonusList": "the luxe hv | 1 | 0"
   },
   "tournament": {
     "title": "Monthly Race",
@@ -37,5 +32,7 @@
     "standingsList": ""
   },
   "slotRequestsOpen": true,
-  "handledSlotRequests": []
+  "handledSlotRequests": [
+    "zyro|the luxe hv|2026-09-15T03:19:54.884777+00:00"
+  ]
 }
