@@ -21,8 +21,8 @@
   "totalWagered": 0,
   "wagerThreshold": 100000,
   "bonusHunt": {
-    "start": 0,
-    "bonusTarget": 0,
+    "start": 1000,
+    "bonusTarget": 25,
     "bonusList": "the luxe hv | 1 | 0"
   },
   "tournament": {
