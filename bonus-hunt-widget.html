@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ZYROS Bonus Hunt Widget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=JetBrains+Mono:wght@500;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --panel:rgba(20,14,32,0.92);
+    --panel-2:rgba(11,7,20,0.94);
+    --border:rgba(255,255,255,0.12);
+    --violet:#8b5cf6; --pink:#ec4899; --gold:#fbbf24; --gold-hi:#fde68a;
+    --text:#f5f3ff; --muted:#a99bc9;
+    --display:'Baloo 2', sans-serif; --body:'Rajdhani', sans-serif; --mono:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{width:1920px;height:1080px;background:transparent;overflow:hidden;font-family:var(--body);}
+
+  .dock{position:absolute;top:40px;left:40px;width:540px;}
+
+  .widget-card{
+    border:1px solid var(--border);border-radius:18px;
+    background:linear-gradient(160deg, var(--panel), var(--panel-2));
+    backdrop-filter:blur(10px);
+    box-shadow:0 20px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,92,246,0.08);
+    overflow:hidden;
+  }
+
+  .widget-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 22px;border-bottom:1px solid var(--border);
+  }
+  .widget-title{font-family:var(--display);font-weight:800;font-size:20px;color:var(--text);}
+  .widget-live{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--gold);}
+  .live-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 6px #4ade80;animation:pulse 1.6s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+  .widget-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
+  .stat-cell{background:var(--panel);padding:14px 16px;text-align:center;}
+  .stat-cell .lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+  .stat-cell .val{font-family:var(--mono);font-weight:800;font-size:17px;color:var(--text);}
+  .stat-cell .val.pl-pos{color:#4ade80;}
+  .stat-cell .val.pl-neg{color:#f87171;}
+  .stat-cell .val.gold{color:var(--gold);}
+
+  .widget-highlights{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-top:1px solid var(--border);}
+  .hl-cell{background:var(--panel);padding:14px 16px;text-align:center;}
+  .hl-cell .hl-label{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:6px;}
+  .hl-cell .hl-slot{font-family:var(--display);font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:3px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hl-cell .hl-val{font-family:var(--mono);font-weight:800;font-size:16px;color:var(--gold);}
+
+  .widget-list{border-top:1px solid var(--border);max-height:340px;overflow:hidden;}
+  .list-head{
+    display:grid;grid-template-columns:0.5fr 2fr 1fr 1.1fr;gap:8px;
+    padding:8px 16px;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;
+    font-weight:700;background:rgba(255,255,255,0.02);
+  }
+  .list-row{
+    display:grid;grid-template-columns:0.5fr 2fr 1fr 1.1fr;gap:8px;align-items:center;
+    padding:9px 16px;border-top:1px solid var(--border);font-size:13px;
+  }
+  .list-row .num{font-family:var(--mono);color:var(--muted);}
+  .list-row .game{font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .list-row .bet{font-family:var(--mono);color:var(--muted);font-size:12.5px;}
+  .list-row .payout{font-family:var(--mono);font-weight:700;color:var(--gold);}
+  .list-empty{padding:20px;text-align:center;color:var(--muted);font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="dock">
+  <div class="widget-card">
+    <div class="widget-header">
+      <div class="widget-title">Bonus Hunt</div>
+      <div class="widget-live"><span class="live-dot"></span>LIVE</div>
+    </div>
+
+    <div class="widget-stats">
+      <div class="stat-cell"><div class="lbl">Start</div><div class="val" id="wStart">$0</div></div>
+      <div class="stat-cell"><div class="lbl">Winnings</div><div class="val" id="wWinnings">$0</div></div>
+      <div class="stat-cell"><div class="lbl">Bonuses</div><div class="val" id="wBonuses">0 / 0</div></div>
+      <div class="stat-cell"><div class="lbl">Remaining</div><div class="val" id="wRemaining">0</div></div>
+      <div class="stat-cell"><div class="lbl">Run Avg</div><div class="val gold" id="wRunAvg">0.00x</div></div>
+      <div class="stat-cell"><div class="lbl">Req Avg</div><div class="val gold" id="wReqAvg">0.00x</div></div>
+    </div>
+
+    <div class="widget-highlights">
+      <div class="hl-cell">
+        <div class="hl-label">★ Best Win</div>
+        <div class="hl-slot" id="wBestSlot">&mdash;</div>
+        <div class="hl-val" id="wBestVal">$0</div>
+      </div>
+      <div class="hl-cell">
+        <div class="hl-label">★ Lucky Win</div>
+        <div class="hl-slot" id="wLuckySlot">&mdash;</div>
+        <div class="hl-val" id="wLuckyVal">0.00x</div>
+      </div>
+    </div>
+
+    <div class="widget-list">
+      <div class="list-head">
+        <div>#</div><div>Game</div><div>Bet</div><div>Payout</div>
+      </div>
+      <div id="wListBody"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function formatUSD(n){
+  const sign = n < 0 ? '-' : '';
+  return sign + '$' + Math.abs(n).toLocaleString('en-US', {maximumFractionDigits:0});
+}
+
+function render(CONFIG){
+  const bh = CONFIG.bonusHunt || {};
+  const start = bh.start || 0;
+  const bonusTarget = bh.bonusTarget || 0;
+
+  const lines = (bh.bonusList||'').split('\n').map(l=>l.trim()).filter(Boolean);
+  const entries = lines.map(line=>{
+    const [slot, denom, amt] = line.split('|').map(s=> s ? s.trim() : s);
+    return { slot: slot||'Unknown', denom: Number(denom)||0, amount: Number(amt)||0 };
+  });
+
+  const bonusCount = entries.length;
+  const winnings = entries.reduce((s,e)=>s+e.amount, 0);
+  const remaining = Math.max(0, bonusTarget - bonusCount);
+  const remainingForMath = Math.max(1, bonusTarget - bonusCount);
+
+  const withDenom = entries.filter(e=>e.denom>0);
+  const multipliers = withDenom.map(e=> e.amount/e.denom);
+  const totalX = multipliers.reduce((s,m)=>s+m,0);
+  const runAvg = multipliers.length>0 ? totalX/multipliers.length : 0;
+  const avgDenom = withDenom.length>0 ? withDenom.reduce((s,e)=>s+e.denom,0)/withDenom.length : 0;
+  const reqAvg = avgDenom>0 ? (start-winnings)/(avgDenom*remainingForMath) : 0;
+
+  document.getElementById('wStart').textContent = formatUSD(start);
+  document.getElementById('wWinnings').textContent = formatUSD(winnings);
+  document.getElementById('wBonuses').textContent = bonusCount + ' / ' + bonusTarget;
+  document.getElementById('wRemaining').textContent = remaining;
+  document.getElementById('wRunAvg').textContent = runAvg.toFixed(2) + 'x';
+  document.getElementById('wReqAvg').textContent = reqAvg.toFixed(2) + 'x';
+
+  const bestWin = entries.length>0 ? entries.reduce((a,b)=> b.amount>a.amount ? b : a) : null;
+  const luckyWin = withDenom.length>0 ? withDenom.reduce((a,b)=> (b.amount/b.denom)>(a.amount/a.denom) ? b : a) : null;
+
+  document.getElementById('wBestSlot').textContent = bestWin ? bestWin.slot : '—';
+  document.getElementById('wBestVal').textContent = formatUSD(bestWin ? bestWin.amount : 0);
+  document.getElementById('wLuckySlot').textContent = luckyWin ? luckyWin.slot : '—';
+  document.getElementById('wLuckyVal').textContent = (luckyWin ? luckyWin.amount/luckyWin.denom : 0).toFixed(2) + 'x';
+
+  const listEl = document.getElementById('wListBody');
+  if(entries.length === 0){
+    listEl.innerHTML = '<div class="list-empty">No bonuses opened yet.</div>';
+  } else {
+    listEl.innerHTML = entries.slice().reverse().map((e,i)=>{
+      const num = entries.length - i;
+      return `<div class="list-row">
+        <div class="num">${num}</div>
+        <div class="game">${e.slot}</div>
+        <div class="bet">$${e.denom.toFixed(2)}</div>
+        <div class="payout">${formatUSD(e.amount)}</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+function load(){
+  fetch('./data.json?t=' + Date.now())
+    .then(res => res.json())
+    .then(render)
+    .catch(()=>{});
+}
+
+load();
+setInterval(load, 15000);
+</script>
+</body>
+</html>

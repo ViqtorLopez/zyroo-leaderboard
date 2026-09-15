@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYROS Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=JetBrains+Mono:wght@500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0714; --panel:#150f24; --border:rgba(255,255,255,0.10);
+    --violet:#8b5cf6; --pink:#ec4899; --gold:#fbbf24;
+    --text:#f5f3ff; --muted:#a99bc9; --danger:#f87171; --success:#4ade80;
+    --display:'Baloo 2', sans-serif; --body:'Rajdhani', sans-serif; --mono:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);padding:40px 20px;line-height:1.5;}
+  .wrap{max-width:640px;margin:0 auto;}
+
+  .gate{
+    position:fixed;inset:0;background:var(--bg);
+    display:flex;align-items:center;justify-content:center;z-index:100;
+  }
+  .gate-box{
+    width:100%;max-width:340px;padding:0 20px;text-align:center;
+  }
+  .gate-box input{margin-bottom:4px;text-align:center;}
+  .gate .status{display:none;}
+  .gate .status.show{display:block;}
+  .gate .btn-row{justify-content:center;}
+  h1{font-family:var(--display);font-size:26px;margin:0 0 6px;}
+  .sub{color:var(--muted);font-size:15px;margin:0 0 30px;}
+
+  .card{
+    background:var(--panel);border:1px solid var(--border);border-radius:16px;
+    padding:24px;margin-bottom:20px;
+  }
+  .card h2{font-family:var(--display);font-size:17px;margin:0 0 14px;}
+
+  label{display:block;font-size:13.5px;color:var(--muted);font-weight:600;margin:14px 0 6px;}
+  label:first-of-type{margin-top:0;}
+  input, textarea{
+    width:100%;background:#0d0817;border:1px solid var(--border);color:var(--text);
+    border-radius:9px;padding:10px 12px;font-family:var(--mono);font-size:14px;
+  }
+  textarea{resize:vertical;min-height:60px;}
+  input:focus, textarea:focus{outline:none;border-color:var(--violet);}
+
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14.5px;
+    padding:11px 20px;border-radius:10px;border:none;cursor:pointer;font-family:var(--body);
+  }
+  .btn-primary{background:linear-gradient(135deg,var(--pink),var(--violet));color:#fff;}
+  .btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--text);}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+  .btn-row{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
+
+  .status{margin-top:14px;font-size:14px;padding:10px 14px;border-radius:8px;display:none;}
+  .status.show{display:block;}
+  .status.ok{background:rgba(74,222,128,0.12);color:var(--success);border:1px solid rgba(74,222,128,0.3);}
+  .status.err{background:rgba(248,113,113,0.12);color:var(--danger);border:1px solid rgba(248,113,113,0.3);}
+  .status.info{background:rgba(139,92,246,0.12);color:#c4b5fd;border:1px solid rgba(139,92,246,0.3);}
+
+  .sub-item{
+    border:1px solid var(--border);border-radius:9px;background:#0d0817;
+    padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px;
+  }
+  .sub-item .info{font-size:13px;line-height:1.5;}
+  .sub-item .info b{color:var(--text);}
+  .sub-item .date{font-size:11px;color:var(--muted);}
+  .copy-btn{
+    flex-shrink:0;background:transparent;border:1px solid var(--border);color:var(--muted);
+    padding:6px 10px;border-radius:7px;font-size:12px;cursor:pointer;font-family:var(--body);
+  }
+  .copy-btn:hover{color:var(--text);border-color:var(--violet);}
+  .copy-btn.copied{color:var(--success);border-color:var(--success);}
+
+  /* ---- page tabs ---- */
+  .page-tabs{display:flex;gap:8px;margin:18px 0 24px;border-bottom:1px solid var(--border);}
+  .page-tab{
+    padding:10px 16px;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer;
+    border-bottom:2px solid transparent;user-select:none;
+  }
+  .page-tab.active{color:var(--violet);border-color:var(--violet);}
+  .page-tab:not(.active):hover{color:var(--text);}
+  .page-view{display:none;}
+  .page-view.active{display:block;}
+
+  /* ---- slot requests page ---- */
+  .sr-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:20px;}
+  .sr-stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;}
+  .sr-stat-card{padding:16px 18px;}
+  .sr-stat-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px;}
+  .sr-stat-value{font-family:var(--mono);font-weight:800;font-size:24px;}
+  .sr-toggle-row{display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:14px;}
+
+  .switch{position:relative;display:inline-block;width:40px;height:22px;}
+  .switch input{opacity:0;width:0;height:0;}
+  .slider{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,0.15);border-radius:22px;transition:.2s;}
+  .slider::before{position:absolute;content:"";height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;}
+  .switch input:checked + .slider{background:var(--violet);}
+  .switch input:checked + .slider::before{transform:translateX(18px);}
+
+  .sr-table{border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+  .sr-table-head{
+    display:grid;grid-template-columns:1fr 1fr 1.2fr 0.8fr 1.3fr;gap:10px;
+    padding:10px 16px;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;
+    font-weight:700;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.02);
+  }
+  .sr-row{
+    display:grid;grid-template-columns:1fr 1fr 1.2fr 0.8fr 1.3fr;gap:10px;align-items:center;
+    padding:12px 16px;font-size:13.5px;border-bottom:1px solid var(--border);
+  }
+  .sr-row:last-child{border-bottom:none;}
+  .sr-row .muted-cell{color:var(--muted);font-size:12.5px;}
+  .sr-row-hide-btn{
+    background:transparent;border:1px solid var(--border);color:var(--muted);
+    padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer;font-family:var(--body);
+  }
+  .sr-row-hide-btn:hover{color:var(--danger);border-color:var(--danger);}
+  .sr-empty{padding:26px;text-align:center;color:var(--muted);font-size:14px;}
+
+  .roll-result{
+    text-align:center;padding:20px;margin-bottom:16px;border-radius:12px;
+    background:linear-gradient(135deg, rgba(236,72,153,0.15), rgba(139,92,246,0.15));
+    border:1px solid var(--violet);
+  }
+  .roll-result .roll-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:6px;}
+  .roll-result .roll-name{font-family:var(--display);font-size:20px;font-weight:800;}
+
+  @media (max-width:600px){
+    .sr-stats-row{grid-template-columns:1fr;}
+    .sr-table-head{display:none;}
+    .sr-row{grid-template-columns:1fr;gap:4px;padding:14px 16px;}
+  }
+
+  .warn{
+    background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.3);border-radius:10px;
+    padding:14px 16px;font-size:13.5px;color:#fde68a;margin-bottom:20px;line-height:1.6;
+  }
+  .warn a{color:#fff;}
+
+  .hist-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:6px;}
+  .hist-grid input{padding:8px 6px;text-align:center;font-size:12.5px;}
+  .hist-day-label{font-size:9.5px;color:var(--muted);text-align:center;margin-bottom:3px;}
+
+  .remember-row{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--muted);}
+  .remember-row input[type="checkbox"]{width:auto;}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="gate-box">
+    <h1 style="font-size:20px;">ZYROS Admin</h1>
+    <p class="sub" style="margin-bottom:20px;">Enter the password to continue.</p>
+    <input type="password" id="gatePassword" placeholder="Password" autofocus>
+    <div class="status err" id="gateError" style="margin-top:10px;">Wrong password. Try again.</div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="gateSubmit">Enter</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="adminWrap" style="display:none;">
+  <h1>ZYROS Rewards &mdash; Admin</h1>
+  <p class="sub">Update the live site's numbers directly. Changes go live within a minute or two of GitHub Pages rebuilding.</p>
+
+  <div class="page-tabs">
+    <div class="page-tab active" data-page="dashboardPage">Dashboard</div>
+    <div class="page-tab" data-page="slotRequestsPage">Slot Requests</div>
+  </div>
+
+  <div class="page-view active" id="dashboardPage">
+
+  <div class="warn">
+    ⚠️ You'll need a GitHub <b>fine-grained personal access token</b> scoped ONLY to this one repository, with <b>Contents: Read and write</b> permission. Don't use a broad/classic token here &mdash; anyone who gets this token could edit your repo. Create one at
+    <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.
+    This token is only stored in your browser (optionally), never sent anywhere except GitHub's own API.
+  </div>
+
+  <div class="card">
+    <h2>Connection</h2>
+    <label>GitHub Personal Access Token</label>
+    <input type="password" id="token" placeholder="github_pat_...">
+
+    <div class="row">
+      <div>
+        <label>Repo owner (username)</label>
+        <input type="text" id="owner" value="ViqtorLopez">
+      </div>
+      <div>
+        <label>Repo name</label>
+        <input type="text" id="repo" value="zyroo-leaderboard">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Branch</label>
+        <input type="text" id="branch" value="main">
+      </div>
+      <div>
+        <label>File path</label>
+        <input type="text" id="path" value="data.json">
+      </div>
+    </div>
+
+    <div class="remember-row">
+      <input type="checkbox" id="remember">
+      <label for="remember" style="margin:0;">Remember these settings (not the token) on this device</label>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="loadBtn">Load current data</button>
+    </div>
+    <div class="status" id="loadStatus"></div>
+  </div>
+
+  <div class="card">
+    <h2>The numbers</h2>
+
+    <div class="row">
+      <div>
+        <label>Monthly P&amp;L ($)</label>
+        <input type="number" id="monthlyPL" value="0">
+      </div>
+      <div>
+        <label>Given away already ($)</label>
+        <input type="number" id="givenAway" value="0">
+      </div>
+    </div>
+
+    <label>Next giveaway date &amp; time</label>
+    <input type="datetime-local" id="nextGiveaway">
+
+    <label>Daily history &mdash; last 14 days ($ committed each day, oldest first)</label>
+    <div class="hist-grid" id="histGrid"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="shiftBtn" type="button">Shift in a new day &rarr;</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Community leaderboard lock</h2>
+    <div class="row">
+      <div>
+        <label>Total wagered so far ($)</label>
+        <input type="number" id="totalWagered" value="0">
+      </div>
+      <div>
+        <label>Unlock threshold ($)</label>
+        <input type="number" id="wagerThreshold" value="100000">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Bonus hunt</h2>
+    <p class="sub" style="margin-bottom:14px;">Bonuses opened, average multiplier, and break-even are now calculated automatically from the list below — no need to type them in.</p>
+    <div class="row">
+      <div>
+        <label>Start balance ($)</label>
+        <input type="number" id="bhStart" value="0">
+      </div>
+      <div>
+        <label>Bonus target (how many you plan to open)</label>
+        <input type="number" id="bhTarget" value="0">
+      </div>
+    </div>
+    <p class="sub" style="margin:6px 0 14px;">Best Win and Lucky Win are now calculated automatically too &mdash; highest payout, and highest multiplier.</p>
+    <label>Bonus list &mdash; one per line, format: Slot Name | Denom | Amount</label>
+    <textarea id="bhList" rows="6" placeholder="Chicken House | 2.50 | 14336&#10;Puffer Stacks | 1.00 | 288"></textarea>
+  </div>
+
+  <div class="card">
+    <h2>Tournament / race</h2>
+    <div class="row">
+      <div>
+        <label>Title</label>
+        <input type="text" id="tourTitle" value="Monthly Race">
+      </div>
+      <div>
+        <label>Prize pool ($)</label>
+        <input type="number" id="tourPrize" value="0">
+      </div>
+    </div>
+    <label>Standings &mdash; one per line, format: Username | Wagered</label>
+    <textarea id="tourList" rows="6" placeholder="zyrostv | 120000&#10;player2 | 95000"></textarea>
+  </div>
+
+  <div class="card">
+    <h2>Pending tournament entries</h2>
+    <p class="sub" style="margin-bottom:16px;">Live entries from the games.html race form. Once confirmed, add them to the standings above yourself.</p>
+    <div class="btn-row" style="margin-bottom:16px;">
+      <button class="btn btn-ghost" id="loadSubmissionsBtn" type="button">Load submissions</button>
+    </div>
+    <div class="status" id="submissionsStatus"></div>
+
+    <div id="tourSubmissionsList" class="sub" style="font-size:13px;">Click "Load submissions" above.</div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="saveBtn">Save to live site</button>
+  </div>
+  <div class="status" id="saveStatus"></div>
+
+  </div><!-- /dashboardPage -->
+
+  <div class="page-view" id="slotRequestsPage">
+    <div class="sr-header">
+      <div>
+        <h2 style="font-size:24px;margin:0 0 4px;">Slot Requests</h2>
+        <p class="sub" style="margin:0;">Manage viewer requests and queue</p>
+      </div>
+      <button class="btn btn-primary" id="rollRandomBtn" type="button">🎲 Roll Random Request</button>
+    </div>
+
+    <div class="sr-stats-row">
+      <div class="card sr-stat-card">
+        <div class="sr-stat-label">Total Requests</div>
+        <div class="sr-stat-value" id="srTotalRequests">0</div>
+      </div>
+      <div class="card sr-stat-card">
+        <div class="sr-stat-label">Unique Viewers</div>
+        <div class="sr-stat-value" id="srUniqueViewers">0</div>
+      </div>
+      <div class="card sr-stat-card">
+        <div class="sr-stat-label">Request Status</div>
+        <div class="sr-toggle-row">
+          <span id="srStatusLabel">Open</span>
+          <label class="switch">
+            <input type="checkbox" id="srStatusToggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="btn-row" style="margin-bottom:16px;">
+        <button class="btn btn-ghost" id="loadSlotRequestsBtn" type="button">Load requests</button>
+        <button class="btn btn-ghost" id="clearAllBtn" type="button" style="border-color:rgba(248,113,113,0.4);color:var(--danger);">Clear All</button>
+        <button class="btn btn-primary" id="saveSlotRequestsBtn" type="button">Save changes</button>
+      </div>
+      <div class="status" id="slotRequestsStatus"></div>
+
+      <div id="rollResult" class="roll-result" style="display:none;"></div>
+
+      <div class="sr-table" id="srTable">
+        <div class="sr-table-head">
+          <div>User</div><div>Slot</div><div>Note</div><div>Time</div><div>Actions</div>
+        </div>
+        <div id="srTableBody"></div>
+      </div>
+    </div>
+  </div><!-- /slotRequestsPage -->
+
+</div>
+
+<script>
+/* ============================================================
+   PASSWORD GATE — this is a deterrent, NOT real security.
+   Anyone who views this page's source can read the password below.
+   Real protection comes from needing a valid GitHub token to save anything.
+   Change 'zyros2026' to whatever you want.
+   ============================================================ */
+const GATE_PASSWORD = 'zyros2026';
+
+const gate = document.getElementById('gate');
+const adminWrap = document.getElementById('adminWrap');
+
+if (sessionStorage.getItem('zyrosGateUnlocked') === 'true') {
+  gate.style.display = 'none';
+  adminWrap.style.display = '';
+}
+
+document.getElementById('gateSubmit').addEventListener('click', unlockGate);
+document.getElementById('gatePassword').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') unlockGate();
+});
+
+function unlockGate(){
+  const input = document.getElementById('gatePassword').value;
+  if(input === GATE_PASSWORD){
+    sessionStorage.setItem('zyrosGateUnlocked', 'true');
+    gate.style.display = 'none';
+    adminWrap.style.display = '';
+  } else {
+    document.getElementById('gateError').classList.add('show');
+  }
+}
+
+const $ = id => document.getElementById(id);
+const histGrid = $('histGrid');
+
+function buildHistInputs(values){
+  histGrid.innerHTML = '';
+  values.forEach((v, i)=>{
+    const wrap = document.createElement('div');
+    const daysAgo = 14 - i;
+    wrap.innerHTML = `<div class="hist-day-label">${daysAgo === 1 ? 'Today' : '-' + (daysAgo-1) + 'd'}</div>
+      <input type="number" value="${v}" data-hist-index="${i}">`;
+    histGrid.appendChild(wrap);
+  });
+}
+buildHistInputs([0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+
+function getHistValues(){
+  return Array.from(histGrid.querySelectorAll('input')).map(inp => Number(inp.value) || 0);
+}
+
+function showStatus(el, msg, type){
+  el.textContent = msg;
+  el.className = 'status show ' + type;
+}
+
+function ghHeaders(token){
+  return {
+    'Authorization': 'Bearer ' + token,
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  };
+}
+
+function apiUrl(){
+  const owner = $('owner').value.trim();
+  const repo = $('repo').value.trim();
+  const path = $('path').value.trim();
+  return `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+}
+
+let currentSha = null;
+
+$('loadBtn').addEventListener('click', async ()=>{
+  const token = $('token').value.trim();
+  if(!token){ showStatus($('loadStatus'), 'Enter your GitHub token first.', 'err'); return; }
+
+  showStatus($('loadStatus'), 'Loading current data…', 'info');
+  try {
+    const branch = $('branch').value.trim();
+    const res = await fetch(apiUrl() + '?ref=' + branch, { headers: ghHeaders(token) });
+    if(!res.ok){
+      const body = await res.json().catch(()=>({}));
+      throw new Error(body.message || ('HTTP ' + res.status));
+    }
+    const json = await res.json();
+    currentSha = json.sha;
+    const content = JSON.parse(atob(json.content));
+
+    $('monthlyPL').value = content.monthlyPL ?? 0;
+    $('givenAway').value = content.givenAway ?? 0;
+    $('totalWagered').value = content.totalWagered ?? 0;
+    $('wagerThreshold').value = content.wagerThreshold ?? 100000;
+    if(content.nextGiveaway){
+      $('nextGiveaway').value = content.nextGiveaway.slice(0,16);
+    }
+    buildHistInputs(content.dailyHistory && content.dailyHistory.length === 14 ? content.dailyHistory : [0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+
+    const bh = content.bonusHunt || {};
+    $('bhStart').value = bh.start ?? 0;
+    $('bhTarget').value = bh.bonusTarget ?? 0;
+    $('bhList').value = bh.bonusList ?? '';
+
+    const tour = content.tournament || {};
+    $('tourTitle').value = tour.title ?? 'Monthly Race';
+    $('tourPrize').value = tour.prizePool ?? 0;
+    $('tourList').value = tour.standingsList ?? '';
+
+    slotRequestsOpen = content.slotRequestsOpen !== false;
+    handledSlotRequests = content.handledSlotRequests || [];
+    $('srStatusToggle').checked = slotRequestsOpen;
+    $('srStatusLabel').textContent = slotRequestsOpen ? 'Open' : 'Closed';
+
+    showStatus($('loadStatus'), 'Loaded current live data successfully.', 'ok');
+  } catch(err){
+    showStatus($('loadStatus'), 'Could not load: ' + err.message, 'err');
+  }
+});
+
+$('shiftBtn').addEventListener('click', ()=>{
+  const vals = getHistValues();
+  vals.shift();
+  vals.push(Number($('monthlyPL').value) * 0.05 || 0);
+  buildHistInputs(vals.map(v => Math.round(v)));
+});
+
+let slotRequestsOpen = true;
+let handledSlotRequests = [];
+
+async function saveData(statusEl){
+  const token = $('token').value.trim();
+  if(!token){ showStatus(statusEl, 'Enter your GitHub token first.', 'err'); return; }
+  if(!currentSha){ showStatus(statusEl, 'Click "Load current data" first (on the Dashboard tab) so changes are based on the latest version.', 'err'); return; }
+
+  const data = {
+    monthlyPL: Number($('monthlyPL').value) || 0,
+    givenAway: Number($('givenAway').value) || 0,
+    nextGiveaway: $('nextGiveaway').value ? $('nextGiveaway').value + ':00' : '',
+    dailyHistory: getHistValues(),
+    totalWagered: Number($('totalWagered').value) || 0,
+    wagerThreshold: Number($('wagerThreshold').value) || 100000,
+    bonusHunt: {
+      start: Number($('bhStart').value) || 0,
+      bonusTarget: Number($('bhTarget').value) || 0,
+      bonusList: $('bhList').value || '',
+    },
+    tournament: {
+      title: $('tourTitle').value || 'Monthly Race',
+      prizePool: Number($('tourPrize').value) || 0,
+      endDate: '2026-10-01T00:00:00',
+      standingsList: $('tourList').value || '',
+    },
+    slotRequestsOpen: slotRequestsOpen,
+    handledSlotRequests: handledSlotRequests,
+  };
+
+  showStatus(statusEl, 'Saving…', 'info');
+  try {
+    const branch = $('branch').value.trim();
+    const contentEncoded = btoa(JSON.stringify(data, null, 2));
+    const res = await fetch(apiUrl(), {
+      method: 'PUT',
+      headers: { ...ghHeaders(token), 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'Update site data via admin panel',
+        content: contentEncoded,
+        sha: currentSha,
+        branch: branch
+      })
+    });
+    if(!res.ok){
+      const body = await res.json().catch(()=>({}));
+      throw new Error(body.message || ('HTTP ' + res.status));
+    }
+    const json = await res.json();
+    currentSha = json.content.sha;
+    showStatus(statusEl, 'Saved! The live site will update within a minute or two.', 'ok');
+  } catch(err){
+    showStatus(statusEl, 'Save failed: ' + err.message, 'err');
+  }
+}
+
+$('saveBtn').addEventListener('click', ()=> saveData($('saveStatus')));
+
+/* ---- remember non-sensitive settings ---- */
+const REMEMBER_KEY = 'zyrosAdminSettings';
+const savedSettings = localStorage.getItem(REMEMBER_KEY);
+if(savedSettings){
+  try {
+    const s = JSON.parse(savedSettings);
+    if(s.owner) $('owner').value = s.owner;
+    if(s.repo) $('repo').value = s.repo;
+    if(s.branch) $('branch').value = s.branch;
+    if(s.path) $('path').value = s.path;
+    $('remember').checked = true;
+  } catch(e){}
+}
+
+function persistIfChecked(){
+  if($('remember').checked){
+    localStorage.setItem(REMEMBER_KEY, JSON.stringify({
+      owner: $('owner').value, repo: $('repo').value,
+      branch: $('branch').value, path: $('path').value
+    }));
+  } else {
+    localStorage.removeItem(REMEMBER_KEY);
+  }
+}
+['owner','repo','branch','path','remember'].forEach(id=>{
+  $(id).addEventListener('change', persistIfChecked);
+});
+
+/* ============================================================
+   FORMSPREE SUBMISSIONS — read-only keys, view-only.
+   These keys can only read submissions, not modify/delete anything.
+   ============================================================ */
+const FORMSPREE_FORMS = {
+  slot: { hashid: 'xoeqgrrq', key: '48c42405dccb0689a3d450bfe6d906c31722fd0f', listEl: 'slotSubmissionsList' },
+  tournament: { hashid: 'mkjndyyj', key: '6c99012e5b809fc8c4e9c8288159faf22b935ba4', listEl: 'tourSubmissionsList' },
+};
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+function formatDate(iso){
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', { month:'short', day:'numeric' }) + ' at ' +
+           d.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+  } catch(e){ return ''; }
+}
+
+async function loadFormspreeSubmissions(formKey){
+  const form = FORMSPREE_FORMS[formKey];
+  const listEl = document.getElementById(form.listEl);
+  listEl.textContent = 'Loading…';
+
+  try {
+    const res = await fetch(`https://formspree.io/api/0/forms/${form.hashid}/submissions`, {
+      headers: { 'Authorization': 'Bearer ' + form.key }
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    const subs = json.submissions || [];
+
+    if(subs.length === 0){
+      listEl.innerHTML = '<div class="sub-item"><div class="info">No submissions yet.</div></div>';
+      return;
+    }
+
+    listEl.innerHTML = subs.slice().reverse().map(s => {
+      const username = escapeHtml(s.username || 'Unknown');
+      const slot = escapeHtml(s.slot || '');
+      const note = s.note ? escapeHtml(s.note) : '';
+      const copyText = `${username} | ${slot}`;
+      const dateStr = formatDate(s._date);
+      return `
+        <div class="sub-item">
+          <div class="info">
+            <b>${username}</b> &mdash; ${slot}${note ? '<br><span style="color:var(--muted);">' + note + '</span>' : ''}
+            <div class="date">${dateStr}</div>
+          </div>
+          <button class="copy-btn" onclick="copySubmission(this, '${copyText.replace(/'/g,"\\'")}')">Copy</button>
+        </div>`;
+    }).join('');
+  } catch(err){
+    listEl.innerHTML = `<div class="sub-item"><div class="info" style="color:var(--danger);">Couldn't load: ${err.message}</div></div>`;
+  }
+}
+
+function copySubmission(btn, text){
+  navigator.clipboard.writeText(text).then(()=>{
+    const original = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+document.getElementById('loadSubmissionsBtn').addEventListener('click', ()=>{
+  const statusEl = document.getElementById('submissionsStatus');
+  statusEl.className = 'status show info';
+  statusEl.textContent = 'Loading…';
+  loadFormspreeSubmissions('tournament').then(()=>{
+    statusEl.className = 'status show ok';
+    statusEl.textContent = 'Loaded.';
+  });
+});
+
+/* ============================================================
+   PAGE TABS (Dashboard / Slot Requests)
+   ============================================================ */
+document.querySelectorAll('.page-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.page-view').forEach(v=>v.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.page).classList.add('active');
+  });
+});
+
+/* ============================================================
+   SLOT REQUESTS PAGE
+   ============================================================ */
+let allSlotRequests = [];
+
+function subKey(sub){
+  return `${sub.username || ''}|${sub.slot || ''}|${sub._date || ''}`;
+}
+
+$('srStatusToggle').addEventListener('change', ()=>{
+  slotRequestsOpen = $('srStatusToggle').checked;
+  $('srStatusLabel').textContent = slotRequestsOpen ? 'Open' : 'Closed';
+});
+
+async function loadSlotRequests(){
+  const statusEl = document.getElementById('slotRequestsStatus');
+  statusEl.className = 'status show info';
+  statusEl.textContent = 'Loading…';
+  try {
+    const res = await fetch(`https://formspree.io/api/0/forms/${FORMSPREE_FORMS.slot.hashid}/submissions`, {
+      headers: { 'Authorization': 'Bearer ' + FORMSPREE_FORMS.slot.key }
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    allSlotRequests = (json.submissions || []).slice().reverse();
+    renderSlotRequestsTable();
+    statusEl.className = 'status show ok';
+    statusEl.textContent = 'Loaded.';
+  } catch(err){
+    statusEl.className = 'status show err';
+    statusEl.textContent = "Couldn't load: " + err.message;
+  }
+}
+
+function visibleRequests(){
+  return allSlotRequests.filter(s => !handledSlotRequests.includes(subKey(s)));
+}
+
+function renderSlotRequestsTable(){
+  const visible = visibleRequests();
+  const body = document.getElementById('srTableBody');
+
+  document.getElementById('srTotalRequests').textContent = visible.length;
+  document.getElementById('srUniqueViewers').textContent = new Set(visible.map(s=>s.username)).size;
+
+  if(visible.length === 0){
+    body.innerHTML = '<div class="sr-empty">No pending requests.</div>';
+    return;
+  }
+
+  body.innerHTML = visible.map(s => {
+    const key = subKey(s);
+    const dateStr = formatDate(s._date);
+    const slotEsc = escapeHtml(s.slot || '').replace(/'/g,"\\'");
+    return `
+      <div class="sr-row">
+        <div><b>${escapeHtml(s.username || 'Unknown')}</b></div>
+        <div>${escapeHtml(s.slot || '')}</div>
+        <div class="muted-cell">${escapeHtml(s.note || '')}</div>
+        <div class="muted-cell">${dateStr}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="sr-row-hide-btn" onclick="addToBonusHunt('${key.replace(/'/g,"\\'")}', '${slotEsc}')">+ Bonus Hunt</button>
+          <button class="sr-row-hide-btn" onclick="hideSlotRequest('${key.replace(/'/g,"\\'")}')">Hide</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function addToBonusHunt(key, slotName){
+  const denom = prompt(`Denom (bet size) for "${slotName}"?`, '');
+  if(denom === null) return; // cancelled
+  const denomNum = Number(denom) || 0;
+  const current = $('bhList').value;
+  const newLine = `${slotName} | ${denomNum} | 0`;
+  $('bhList').value = current ? current + '\n' + newLine : newLine;
+
+  if(!handledSlotRequests.includes(key)) handledSlotRequests.push(key);
+  renderSlotRequestsTable();
+
+  const statusEl = document.getElementById('slotRequestsStatus');
+  statusEl.className = 'status show ok';
+  statusEl.textContent = `Added "${slotName}" to the Bonus Hunt list (Dashboard tab). Click "Save changes" to publish, and fill in the payout once you know it.`;
+}
+
+function hideSlotRequest(key){
+  if(!handledSlotRequests.includes(key)) handledSlotRequests.push(key);
+  renderSlotRequestsTable();
+}
+
+document.getElementById('loadSlotRequestsBtn').addEventListener('click', loadSlotRequests);
+
+document.getElementById('clearAllBtn').addEventListener('click', ()=>{
+  visibleRequests().forEach(s => handledSlotRequests.push(subKey(s)));
+  document.getElementById('rollResult').style.display = 'none';
+  renderSlotRequestsTable();
+});
+
+document.getElementById('saveSlotRequestsBtn').addEventListener('click', ()=>{
+  saveData(document.getElementById('slotRequestsStatus'));
+});
+
+document.getElementById('rollRandomBtn').addEventListener('click', ()=>{
+  const visible = visibleRequests();
+  const resultEl = document.getElementById('rollResult');
+  if(visible.length === 0){
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = '<div class="roll-label">Nothing to roll</div><div class="roll-name">Queue is empty</div>';
+    return;
+  }
+  const pick = visible[Math.floor(Math.random() * visible.length)];
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `<div class="roll-label">🎲 Selected</div><div class="roll-name">${escapeHtml(pick.slot)} &mdash; requested by ${escapeHtml(pick.username)}</div>`;
+});
+</script>
+</body>
+</html>
