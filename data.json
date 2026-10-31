@@ -18,8 +18,125 @@
     0,
     0
   ],
-  "totalWagered": 0,
-  "wagerThreshold": 100000,
+  "casino": {
+    "name": "Thrill",
+    "code": "ZYRO",
+    "signupUrl": "https://thrill.com/?r=zyro",
+    "claimUrl": ""
+  },
+  "leaderboard": {
+    "title": "Monthly leaderboard",
+    "endDate": "",
+    "updatedAt": "2026-10-31T04:00:36.259Z",
+    "prizes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "rewards": {
+    "tiers": [
+      {
+        "wager": 12500,
+        "reward": 50
+      },
+      {
+        "wager": 25000,
+        "reward": 75
+      },
+      {
+        "wager": 50000,
+        "reward": 75
+      },
+      {
+        "wager": 75000,
+        "reward": 100
+      },
+      {
+        "wager": 125000,
+        "reward": 200
+      },
+      {
+        "wager": 250000,
+        "reward": 500
+      },
+      {
+        "wager": 375000,
+        "reward": 500
+      },
+      {
+        "wager": 500000,
+        "reward": 500
+      },
+      {
+        "wager": 750000,
+        "reward": 1000
+      },
+      {
+        "wager": 1000000,
+        "reward": 1000
+      },
+      {
+        "wager": 1250000,
+        "reward": 1000
+      },
+      {
+        "wager": 1500000,
+        "reward": 1000
+      },
+      {
+        "wager": 1750000,
+        "reward": 1000
+      },
+      {
+        "wager": 2000000,
+        "reward": 1000
+      },
+      {
+        "wager": 2250000,
+        "reward": 1000
+      },
+      {
+        "wager": 2500000,
+        "reward": 1000
+      },
+      {
+        "wager": 3750000,
+        "reward": 5000
+      },
+      {
+        "wager": 5000000,
+        "reward": 5000
+      },
+      {
+        "wager": 7500000,
+        "reward": 10000
+      },
+      {
+        "wager": 10000000,
+        "reward": 10000
+      }
+    ]
+  },
+  "raffle": {
+    "prize": 150,
+    "round": 1,
+    "ticketRate": 50,
+    "drawDate": "",
+    "latestWinner": {
+      "name": "",
+      "ticket": "",
+      "round": 0
+    }
+  },
+  "socials": [],
   "bonusHunt": {
     "start": 1000,
     "bonusTarget": 25,
