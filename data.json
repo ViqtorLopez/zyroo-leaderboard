@@ -27,7 +27,7 @@
   "leaderboard": {
     "title": "Monthly leaderboard",
     "endDate": "",
-    "updatedAt": "2026-10-31T06:40:58.304Z",
+    "updatedAt": "2026-10-31T17:30:20.704Z",
     "prizes": [
       700,
       450,
@@ -40,6 +40,11 @@
       50,
       50
     ]
+  },
+  "promo": {
+    "on": true,
+    "title": "Double weekly & monthly bonuses",
+    "text": "Play under code ZYRO and your Thrill weekly bonus and monthly bonus are doubled by ZyrosTV."
   },
   "rewards": {
     "tiers": [
