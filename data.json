@@ -27,7 +27,7 @@
   "leaderboard": {
     "title": "Monthly leaderboard",
     "endDate": "",
-    "updatedAt": "2026-10-31T04:12:42.305Z",
+    "updatedAt": "2026-10-31T04:29:23.518Z",
     "prizes": [
       700,
       450,
@@ -45,83 +45,83 @@
     "tiers": [
       {
         "wager": 12500,
-        "reward": 50
+        "reward": 10
       },
       {
         "wager": 25000,
-        "reward": 75
+        "reward": 15
       },
       {
         "wager": 50000,
-        "reward": 75
+        "reward": 25
       },
       {
         "wager": 75000,
-        "reward": 100
+        "reward": 30
       },
       {
         "wager": 125000,
-        "reward": 200
+        "reward": 50
       },
       {
         "wager": 250000,
-        "reward": 500
+        "reward": 100
       },
       {
         "wager": 375000,
-        "reward": 500
+        "reward": 100
       },
       {
         "wager": 500000,
-        "reward": 500
+        "reward": 150
       },
       {
         "wager": 750000,
-        "reward": 1000
+        "reward": 200
       },
       {
         "wager": 1000000,
-        "reward": 1000
+        "reward": 300
       },
       {
         "wager": 1250000,
-        "reward": 1000
+        "reward": 300
       },
       {
         "wager": 1500000,
-        "reward": 1000
+        "reward": 300
       },
       {
         "wager": 1750000,
-        "reward": 1000
+        "reward": 400
       },
       {
         "wager": 2000000,
-        "reward": 1000
+        "reward": 400
       },
       {
         "wager": 2250000,
-        "reward": 1000
+        "reward": 400
       },
       {
         "wager": 2500000,
-        "reward": 1000
+        "reward": 500
       },
       {
         "wager": 3750000,
-        "reward": 5000
+        "reward": 1000
       },
       {
         "wager": 5000000,
-        "reward": 5000
+        "reward": 1500
       },
       {
         "wager": 7500000,
-        "reward": 10000
+        "reward": 2000
       },
       {
         "wager": 10000000,
-        "reward": 10000
+        "reward": 3000
       }
     ]
   },
