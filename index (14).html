@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZyrosTV Rewards</title>
+<meta name="description" content="ZyrosTV leaderboard, wager rewards and raffle on Thrill. Code ZYROS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08090a; --panel:#0f1213; --panel2:#141819; --line:#1f2527; --line2:#2a3235;
+  --green:#53fc18; --green-dim:#2f8f0f; --red:#e11d2e; --text:#f3f6f4; --muted:#8c9893;
+  --gold:#ffd24a; --silver:#c9d1cf; --bronze:#d8934f;
+  --display:'Anton','Barlow Condensed',Impact,sans-serif;
+  --head:'Barlow Condensed','Inter',sans-serif;
+  --body:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+[hidden]{display:none!important}
+.wrap{width:100%;max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* ---------- header ---------- */
+.top{position:sticky;top:0;z-index:50;background:rgba(8,9,10,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:22px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex:none}
+.logo b{display:grid;place-items:center;width:34px;height:34px;border-radius:8px;background:var(--green);color:#000;font-family:var(--display);font-size:20px;line-height:1}
+.logo span{font-family:var(--display);font-size:21px;letter-spacing:.03em;text-transform:uppercase}
+nav.tabs{display:flex;gap:2px;flex:1;overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs a{position:relative;padding:21px 14px;font-weight:600;font-size:15px;color:#cfd8d4;text-decoration:none;white-space:nowrap}
+nav.tabs a:hover{color:#fff}
+nav.tabs a.on{color:var(--green)}
+nav.tabs a.on::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--green)}
+.acts{display:flex;align-items:center;gap:10px;flex:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:8px;padding:11px 20px;font-weight:700;font-size:15px;text-decoration:none;background:var(--green);color:#000;transition:transform .12s,filter .12s}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn.ghost{background:#1b2022;color:var(--text);border:1px solid var(--line2)}
+.btn.sm{padding:8px 14px;font-size:14px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;filter:none}
+.chipw{position:relative}
+.chip{display:flex;align-items:center;gap:8px;background:#1b2022;border:1px solid var(--line2);border-radius:999px;padding:5px 14px 5px 5px;font-weight:600;font-size:14px}
+.chip i{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--green);color:#000;font-style:normal;font-weight:800;font-size:13px}
+.menu{position:absolute;right:0;top:calc(100% + 8px);min-width:210px;background:var(--panel2);border:1px solid var(--line2);border-radius:12px;padding:8px;display:none;box-shadow:0 18px 40px rgba(0,0,0,.6)}
+.menu.open{display:block}
+.menu small{display:block;padding:8px 10px;color:var(--muted);font-size:13px}
+.menu a,.menu button{display:block;width:100%;text-align:left;background:none;border:0;border-radius:8px;padding:9px 10px;font-weight:600;font-size:14.5px;text-decoration:none}
+.menu a:hover,.menu button:hover{background:#1e2527}
+
+/* ---------- hero banner ---------- */
+.banner{position:relative;overflow:hidden;border-bottom:1px solid var(--line);background:
+  radial-gradient(900px 300px at 85% 20%,rgba(225,29,46,.28),transparent 65%),
+  radial-gradient(700px 300px at 5% 100%,rgba(83,252,24,.10),transparent 65%),#0a0b0c}
+.banner::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 2px,transparent 2px 14px);pointer-events:none}
+.banner .slash{position:absolute;right:-8%;bottom:-40px;width:58%;height:120px;background:var(--red);transform:skewX(-24deg) rotate(-3deg);opacity:.9;filter:blur(.3px)}
+.banner .slash.b{height:36px;bottom:70px;right:-14%;width:48%;background:#fff;opacity:.9}
+.banner .wrap{position:relative;padding-top:54px;padding-bottom:62px}
+.pill{display:inline-flex;align-items:center;gap:8px;background:#0b0d0e;border:1px solid var(--line2);border-radius:8px;padding:7px 12px;font-size:13.5px;font-weight:700;text-decoration:none}
+.pill em{font-style:normal;background:#fff;color:#000;border-radius:4px;padding:1px 6px;font-size:12px;font-weight:800;letter-spacing:.04em}
+.pill .d{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+h1.mega{font-family:var(--display);font-weight:400;font-size:clamp(54px,11vw,128px);line-height:.95;letter-spacing:.005em;text-transform:uppercase;margin:18px 0 10px;transform:skewX(-4deg);text-shadow:4px 4px 0 rgba(0,0,0,.55)}
+h1.mega span{color:var(--green)}
+.lede{max-width:560px;color:#c3ccc8;font-size:18px}
+.lede b{color:#fff}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.fine{margin-top:16px;max-width:600px;color:var(--muted);font-size:13px}
+
+/* ---------- sections ---------- */
+main{min-height:60vh}
+.sec{padding:42px 0 6px}
+.sec-h{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.sec-h h2,.pagehead h1{font-family:var(--head);font-weight:800;font-size:clamp(30px,5vw,44px);line-height:1;letter-spacing:.01em;text-transform:uppercase}
+.sec-h h2 span,.pagehead h1 span{color:var(--green)}
+.upd{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin-top:8px}
+.upd i{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.link{color:var(--green);font-weight:700;text-decoration:none;font-size:15px}
+.link:hover{text-decoration:underline}
+.pagehead{padding:46px 0 10px}
+.pagehead p{margin-top:12px;color:#b9c3bf;max-width:680px;font-size:17px}
+.pagehead p b{color:#fff}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:6px 0 0}
+.stat{padding:20px 22px}
+.stat label{display:block;color:var(--muted);font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.stat .v{font-family:var(--head);font-weight:800;font-size:38px;line-height:1.1;margin-top:6px}
+.stat .v.g{color:var(--green)}
+.stat small{display:block;color:var(--muted);font-size:13.5px;margin-top:2px}
+
+/* ---------- podium ---------- */
+.podium{display:grid;grid-template-columns:1fr 1.12fr 1fr;gap:14px;align-items:end;margin-bottom:14px}
+.pod{position:relative;padding:22px 20px;text-align:center;overflow:hidden}
+.pod.r1{padding-top:34px;padding-bottom:30px;border-color:rgba(255,210,74,.45);background:linear-gradient(180deg,rgba(255,210,74,.10),var(--panel) 65%)}
+.pod.r2{border-color:rgba(201,209,207,.3)}
+.pod.r3{border-color:rgba(216,147,79,.35)}
+.pod .medal{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:50%;font-family:var(--head);font-weight:800;font-size:20px;color:#000}
+.r1 .medal{background:var(--gold)} .r2 .medal{background:var(--silver)} .r3 .medal{background:var(--bronze)}
+.pod .nm{font-weight:800;font-size:19px;margin-top:10px;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.pod .wg{color:var(--muted);font-size:13px;margin-top:8px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.pod .wv{font-family:var(--head);font-weight:700;font-size:23px}
+.pod .pz{margin-top:12px;font-family:var(--head);font-weight:800;font-size:34px;color:var(--green);line-height:1}
+.r1 .pz{font-size:44px}
+.you{background:var(--green);color:#000;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:800;letter-spacing:.05em}
+
+/* ---------- table ---------- */
+.tbl{overflow:hidden}
+.tr{display:grid;grid-template-columns:70px 1.3fr 1.5fr 110px;align-items:center;gap:12px;padding:13px 22px;border-top:1px solid var(--line)}
+.tr.th{border-top:0;background:#0b0d0e;color:var(--muted);font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding-top:14px;padding-bottom:14px}
+.tr:not(.th):hover{background:#12171a}
+.tr.me{background:rgba(83,252,24,.07);box-shadow:inset 3px 0 0 var(--green)}
+.tr .rk{font-family:var(--head);font-weight:800;font-size:22px;color:#cbd5d1}
+.tr .rk.t{color:var(--green)}
+.tr .pn{font-weight:700;display:flex;align-items:center;gap:10px;min-width:0}
+.tr .wg{font-family:var(--head);font-weight:700;font-size:19px}
+.bar{height:5px;border-radius:5px;background:#1b2123;margin-top:5px;overflow:hidden;max-width:240px}
+.bar i{display:block;height:100%;background:var(--green);border-radius:5px}
+.tr .pz{text-align:right;font-family:var(--head);font-weight:800;font-size:21px;color:var(--green)}
+.tr .pz.none{color:#46514d}
+.empty{padding:40px 22px;text-align:center;color:var(--muted)}
+.foot-note{padding:14px 22px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.more{display:flex;justify-content:center;margin:20px 0 0}
+
+/* ---------- rewards ---------- */
+.ladder{display:grid;gap:12px;margin-top:20px}
+.tier{display:grid;grid-template-columns:54px 1fr auto;gap:18px;align-items:center;padding:18px 22px}
+.tier .n{display:grid;place-items:center;width:46px;height:46px;border-radius:12px;background:#1a2022;font-family:var(--head);font-weight:800;font-size:22px;color:#7d8a85}
+.tier.ok .n{background:var(--green);color:#000}
+.tier .w{font-family:var(--head);font-weight:800;font-size:26px;line-height:1.1}
+.tier .w small{font-family:var(--body);font-weight:500;font-size:13.5px;color:var(--muted);margin-left:8px}
+.tier .rw{color:var(--green);font-weight:700;margin-top:2px}
+.tier.done{opacity:.6}
+.prog{height:8px;border-radius:8px;background:#1b2123;margin-top:10px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--green)}
+.msg{margin-top:14px;font-weight:600;min-height:22px}
+.msg.err{color:#ff6b78}
+.userbar{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;padding:22px 24px;margin-top:22px}
+.userbar .nm{font-family:var(--head);font-weight:800;font-size:30px}
+.userbar .sm{color:var(--muted);font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+
+/* ---------- raffle / profile / misc ---------- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.big{padding:24px}
+.big label{display:block;color:var(--muted);font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.big .v{font-family:var(--head);font-weight:800;font-size:52px;line-height:1.05;margin-top:6px}
+.big .v.g{color:var(--green)}
+.big p{color:var(--muted);margin-top:6px;font-size:14.5px}
+.steps{display:grid;gap:10px;margin-top:16px}
+.steps div{display:flex;gap:14px;padding:16px 20px}
+.steps b{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--green);color:#000;font-weight:800;font-size:14px}
+.steps p{color:#b9c3bf}
+.soon{padding:64px 24px;text-align:center;margin-top:24px}
+.soon h2{font-family:var(--display);font-weight:400;font-size:clamp(40px,8vw,76px);text-transform:uppercase;line-height:1}
+.soon h2 span{color:var(--green)}
+.soon p{color:var(--muted);margin:14px auto 22px;max-width:420px}
+.socials{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:22px}
+.soc{display:flex;align-items:center;gap:16px;padding:20px;text-decoration:none;transition:border-color .15s,transform .15s}
+.soc:hover{border-color:var(--green);transform:translateY(-2px)}
+.soc b{display:grid;place-items:center;width:48px;height:48px;border-radius:12px;background:var(--green);color:#000;font-family:var(--head);font-weight:800;font-size:22px}
+.soc strong{display:block;font-size:18px}
+.soc span{color:var(--muted);font-size:13.5px}
+.profhead{display:flex;align-items:center;gap:18px;margin-top:26px}
+.avatar{display:grid;place-items:center;width:68px;height:68px;border-radius:16px;background:var(--green);color:#000;font-family:var(--display);font-size:34px}
+.tags{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.tag{border:1px solid var(--line2);border-radius:6px;padding:3px 9px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#cfd8d4}
+.tag.g{border-color:var(--green);color:var(--green)}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line);margin-top:18px;padding-top:16px}
+.trio div{padding:0 18px;border-left:1px solid var(--line)} .trio div:first-child{padding-left:0;border:0}
+.trio label{display:block;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.trio .v{font-family:var(--head);font-weight:800;font-size:26px;margin-top:2px}
+
+/* ---------- footer / modal ---------- */
+footer{margin-top:70px;border-top:1px solid var(--line);padding:30px 0 40px;color:var(--muted);font-size:13px}
+footer .row{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:12px}
+footer a{color:#cfd8d4;text-decoration:none;font-weight:600} footer a:hover{color:var(--green)}
+input.hin{width:100%;background:#0a0c0d;border:1px solid var(--line2);border-radius:10px;padding:12px 14px;color:var(--text);font:inherit}
+input.hin:focus{outline:2px solid var(--green)}
+dialog{margin:auto;border:1px solid var(--line2);border-radius:16px;background:var(--panel2);color:var(--text);padding:26px;width:min(420px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.72)}
+dialog h3{font-family:var(--head);font-weight:800;font-size:28px;text-transform:uppercase}
+dialog p{color:var(--muted);font-size:14.5px;margin:8px 0 16px}
+dialog input{width:100%;background:#0a0c0d;border:1px solid var(--line2);border-radius:10px;padding:13px 14px;color:var(--text);font:inherit;font-size:16px}
+dialog input:focus{outline:2px solid var(--green);outline-offset:0}
+dialog .row{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+.err{color:#ff6b78;font-size:13.5px;min-height:18px;margin-top:8px}
+
+@media (max-width:860px){
+  .top .wrap{height:auto;flex-wrap:wrap;gap:6px 12px;padding-top:10px;padding-bottom:0}
+  nav.tabs{order:3;flex-basis:100%;margin:0 -8px}
+  nav.tabs a{padding:12px 12px}
+  .acts{margin-left:auto}
+  .stats,.grid2{grid-template-columns:1fr}
+  .podium{grid-template-columns:1fr;gap:10px}
+  .podium .r1{order:-1}
+  .tr{grid-template-columns:46px 1fr 90px;padding:12px 16px}
+  .tr .wcol{grid-column:2/3}
+  .tr.th .wcol{display:none}
+  .tier{grid-template-columns:44px 1fr;}
+  .tier .act{grid-column:1/3}
+  .trio{grid-template-columns:1fr;gap:12px}
+  .trio div{padding:0;border:0}
+  .banner .slash{opacity:.18}
+  .banner .slash.b{display:none}
+}
+@media (max-width:520px){
+  .wrap{padding:0 16px}
+  .logo span{display:none}
+  .btn{padding:10px 14px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#/"><b>Z</b><span>ZyrosTV</span></a>
+    <nav class="tabs" id="tabs"></nav>
+    <div class="acts" id="acts"></div>
+  </div>
+</header>
+
+<main id="app"><div class="wrap" style="padding-top:60px;color:#8c9893">Loading…</div></main>
+
+<footer>
+  <div class="wrap">
+    <div class="row" id="footLinks"></div>
+    <div id="footNote">ZyrosTV Rewards &middot; 18+ &middot; play responsibly</div>
+  </div>
+</footer>
+
+<dialog id="linkDlg">
+  <form method="dialog" id="linkForm">
+    <h3>Link your account</h3>
+    <p id="linkTxt">Type the username you play with. It's saved in this browser only.</p>
+    <input id="linkInput" type="text" autocomplete="off" maxlength="40" required placeholder="your username">
+    <div class="err" id="linkErr"></div>
+    <div class="row"><button type="button" class="btn ghost sm" id="linkCancel">Cancel</button><button type="submit" class="btn sm">Link account</button></div>
+  </form>
+</dialog>
+
+<dialog id="authDlg">
+  <form method="dialog" id="authForm">
+    <h3 id="auTitle">Log in</h3>
+    <p id="auSub">Log in to keep your profile and link your Kick.</p>
+    <input id="auEmail" type="email" required placeholder="email" autocomplete="email">
+    <input id="auPass" type="password" required minlength="8" placeholder="password (8+ characters)" autocomplete="current-password" style="margin-top:10px">
+    <div class="err" id="auErr"></div>
+    <div class="row"><button type="button" class="btn ghost sm" id="auSwitch">Create account instead</button><button type="submit" class="btn sm" id="auGo">Log in</button></div>
+    <div class="row" style="justify-content:flex-start;margin-top:10px"><button type="button" class="btn ghost sm" id="auCancel">Cancel</button></div>
+  </form>
+</dialog>
+
+<script>
+/* Accounts are optional. Leave both blank and the site works exactly as before.
+   Fill these in after following SETUP.md (the anon key is meant to be public). */
+window.ZY_CONFIG = { supabaseUrl: 'https://jvkbejhctbifeewcimwp.supabase.co', supabaseAnonKey: 'sb_publishable_UOokKUM2LmGDgmc4W9IXgg_t1js0xlF' };
+</script>
+<script>
+(function(){
+'use strict';
+
+/* ====================== config + data ====================== */
+const DEFAULTS = {
+  casino: { name:'Thrill', code:'ZYROS', signupUrl:'https://thrill.com', claimUrl:'' },
+  leaderboard: { title:'Monthly leaderboard', endDate:'', updatedAt:'', prizes:[700,400,300,200,150,100,60,40,30,20] },
+  rewards: { tiers:[] },
+  raffle: { prize:150, round:1, ticketRate:50, drawDate:'', latestWinner:{ round:0, ticket:'', name:'' } },
+  socials: [
+    { label:'X', url:'https://x.com/ZyrosLive' },
+    { label:'Kick', url:'https://kick.com/zyrostv' },
+    { label:'Discord', url:'https://discord.gg/AztFxHBhD' }
+  ]
+};
+const LINK_KEY='zyrosLinked', CLAIM_KEY='zyrosClaims';
+const TOP_HOME=10, TOP_FULL=100, PAID=10;
+
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = (s,r) => (r||document).querySelector(s);
+const money = n => '$'+Math.round(Number(n)||0).toLocaleString('en-US');
+const num = n => Math.round(Number(n)||0).toLocaleString('en-US');
+
+function merge(base, extra){
+  if(Array.isArray(base) || base===null || typeof base!=='object') return (extra===undefined||extra===null)?base:extra;
+  const out=Object.assign({},base);
+  if(extra && typeof extra==='object') Object.keys(extra).forEach(k=>{ out[k]=(k in base)?merge(base[k],extra[k]):extra[k]; });
+  return out;
+}
+async function getJson(url,ms){
+  try{
+    const r = await Promise.race([fetch(url+'?t='+Date.now()), new Promise((_,j)=>setTimeout(()=>j(0),ms||4000))]);
+    if(!r.ok) return null; return await r.json();
+  }catch(e){ return null; }
+}
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+async function sha(s){
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s.trim().toLowerCase()));
+  return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+/* ====================== state ====================== */
+const S = { data:DEFAULTS, players:[], playersUpdated:'', linked:null, board:[], me:null, period:'current' };
+
+function rebuild(){
+  S.linked = store.get(LINK_KEY);
+  S.board = S.players.slice().sort((a,b)=>b.w-a.w).map((p,i)=>Object.assign({rank:i+1},p));
+  S.me = S.linked ? (S.board.find(p=>p.h===S.linked.h) || null) : null;
+  S.period = S.data.leaderboard.endDate || 'current';
+}
+const prizes = () => S.data.leaderboard.prizes.slice(0,PAID).map(Number);
+const pool = () => prizes().reduce((a,b)=>a+(b||0),0);
+const claims = () => { const a=store.get(CLAIM_KEY)||{}; return (S.linked && a[S.period] && a[S.period][S.linked.h]) || []; };
+function saveClaim(i){
+  const a=store.get(CLAIM_KEY)||{}; a[S.period]=a[S.period]||{}; a[S.period][S.linked.h]=(a[S.period][S.linked.h]||[]).concat(i); store.set(CLAIM_KEY,a);
+}
+const tickets = w => { const r=Number(S.data.raffle.ticketRate)||0; return r>0?Math.floor(w/r):0; };
+
+function fmtDate(iso){
+  if(!iso) return '';
+  const d=new Date(iso); if(isNaN(d)) return '';
+  return d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+let timers=[];
+function countdown(el, iso, doneTxt, emptyTxt){
+  if(!el) return;
+  const end = iso ? new Date(iso).getTime() : NaN;
+  if(isNaN(end)){ el.textContent = emptyTxt||'Date TBA'; return; }
+  const tick=()=>{
+    const ms=end-Date.now();
+    if(ms<=0){ el.textContent=doneTxt||'Closed'; return false; }
+    const s=Math.floor(ms/1000), d=Math.floor(s/86400), h=Math.floor(s%86400/3600), m=Math.floor(s%3600/60), x=s%60;
+    el.textContent=d+'d '+String(h).padStart(2,'0')+'h '+String(m).padStart(2,'0')+'m '+String(x).padStart(2,'0')+'s';
+    return true;
+  };
+  if(tick()){ const id=setInterval(()=>{ if(!document.body.contains(el)||!tick()) clearInterval(id); },1000); timers.push(id); }
+}
+
+
+/* ====================== accounts (Supabase + Kick) ====================== */
+const A = { on:false, client:null, session:null, profile:null, isAdmin:false, flash:'', flashErr:false };
+function loadScript(src){ return new Promise((ok,no)=>{ const t=document.createElement('script'); t.src=src; t.onload=ok; t.onerror=no; document.head.appendChild(t); }); }
+async function loadProfile(){
+  A.profile=null; A.isAdmin=false; if(!A.on||!A.session) return;
+  try{ const r=await A.client.from('admins').select('user_id').eq('user_id',A.session.user.id).maybeSingle(); A.isAdmin=!!(r.data); }catch(e){}
+  try{
+    const r=await A.client.from('profiles').select('kick_id,kick_username').eq('user_id',A.session.user.id).maybeSingle();
+    A.profile=r.data||{};
+  }catch(e){ A.profile={}; }
+}
+const kickCall = body => fnCall('kick-link', body);
+async function fnCall(name, body){
+  const r=await A.client.functions.invoke(name,{body});
+  if(r.error){ let m='Something went wrong. Try again.'; try{ const j=await r.error.context.json(); if(j&&j.error) m=j.error; }catch(e){} throw new Error(m); }
+  return r.data;
+}
+async function initAuth(){
+  const c=window.ZY_CONFIG||{};
+  if(!c.supabaseUrl||!c.supabaseAnonKey) return;
+  try{ await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.js'); }catch(e){ return; }
+  if(!window.supabase) return;
+  try{
+    A.client=window.supabase.createClient(c.supabaseUrl,c.supabaseAnonKey); A.on=true;
+    const g=await A.client.auth.getSession(); A.session=g.data.session;
+    A.client.auth.onAuthStateChange((ev,sess)=>{ A.session=sess; });
+    const q=new URLSearchParams(location.search), code=q.get('code'), st=q.get('state'), er=q.get('error');
+    if(code||er){
+      history.replaceState(null,'',location.pathname+'#/profile');
+      if(er){ A.flash='Kick linking was cancelled.'; A.flashErr=true; }
+      else if(!A.session){ A.flash='Log in first, then link your Kick again.'; A.flashErr=true; }
+      else{
+        const purpose=store.get('zyrosKickPurpose'); store.del('zyrosKickPurpose');
+        try{
+          if(purpose==='connect'){ await fnCall('giveaway-admin',{action:'connect_finish',code,state:st}); A.flash='Kick chat connected. Giveaway entries will now come in from chat.'; A.flashErr=false; history.replaceState(null,'',location.pathname+'#/host'); }
+          else{ const d=await kickCall({action:'finish',code,state:st}); A.flash='Kick linked as '+d.kick_username+'.'; A.flashErr=false; }
+        }catch(e){ A.flash=e.message; A.flashErr=true; }
+      }
+    }
+    await loadProfile();
+  }catch(e){ A.on=false; }
+}
+let authMode='login';
+function openAuth(mode){
+  authMode=mode||'login'; syncAuth(); $('#auErr').textContent=''; const d=$('#authDlg'); if(d.showModal) d.showModal(); else d.setAttribute('open',''); $('#auEmail').focus();
+}
+function syncAuth(){
+  const l=authMode==='login';
+  $('#auTitle').textContent=l?'Log in':'Create account';
+  $('#auSub').textContent=l?'Log in to keep your profile and link your Kick.':'Make an account to link your Kick and keep your profile across devices.';
+  $('#auGo').textContent=l?'Log in':'Create account';
+  $('#auSwitch').textContent=l?'Create account instead':'I have an account';
+  $('#auPass').autocomplete=l?'current-password':'new-password';
+}
+async function afterAuth(){ await loadProfile(); chrome(); route(); }
+async function logout(){ try{ await A.client.auth.signOut(); }catch(e){} A.session=null; A.profile=null; location.hash='#/'; chrome(); route(); }
+$('#auSwitch').onclick=()=>{ authMode=authMode==='login'?'signup':'login'; syncAuth(); };
+$('#auCancel').onclick=()=>$('#authDlg').close();
+$('#authForm').addEventListener('submit',async e=>{
+  e.preventDefault(); const em=$('#auEmail').value.trim(), pw=$('#auPass').value, err=$('#auErr'), go=$('#auGo'); err.style.color=''; err.textContent=''; go.disabled=true;
+  try{
+    if(authMode==='login'){
+      const r=await A.client.auth.signInWithPassword({email:em,password:pw}); if(r.error) throw r.error;
+      A.session=r.data.session; $('#authDlg').close(); await afterAuth();
+    }else{
+      const r=await A.client.auth.signUp({email:em,password:pw,options:{emailRedirectTo:location.origin+location.pathname}}); if(r.error) throw r.error;
+      if(r.data.session){ A.session=r.data.session; $('#authDlg').close(); await afterAuth(); }
+      else{ err.style.color='var(--green)'; err.textContent='Check your email to confirm your account, then log in.'; }
+    }
+  }catch(x){ err.textContent=x.message||'Something went wrong.'; }
+  go.disabled=false;
+});
+function accountName(){
+  if(A.on&&A.session) return (A.profile&&A.profile.kick_username)||String(A.session.user.email||'account').split('@')[0];
+  return S.linked?S.linked.u:null;
+}
+
+/* ====================== chrome ====================== */
+const NAV=[['leaderboard','Leaderboard'],['rewards','Rewards'],['raffle','Raffle'],['giveaway','Giveaway'],['shop','Shop'],['socials','Socials']];
+function chrome(){
+  const c=S.data.casino;
+  $('#tabs').innerHTML = '<a href="#/" data-k="home">Home</a>'+NAV.map(n=>'<a href="#/'+n[0]+'" data-k="'+n[0]+'">'+n[1]+'</a>').join('')+'<a href="games.html">Games</a>';
+  const who=accountName();
+  $('#acts').innerHTML = (who
+    ? '<div class="chipw"><button class="chip" id="chipBtn"><i>'+esc(who.charAt(0).toUpperCase())+'</i>'+esc(who)+'</button>'+
+      '<div class="menu" id="menu"><small>Signed in as <b>'+esc(who)+'</b></small><a href="#/profile">Profile</a><a href="#/rewards">Rewards</a>'+(A.isAdmin?'<a href="#/host">Host giveaway</a>':'')+
+      (A.on&&!A.session?'<button id="mLogin">Log in / Create account</button>':'')+
+      (A.on&&A.session?'<button id="mLogout">Log out</button>':'')+
+      (S.linked?'<button id="unlinkBtn">Unlink Thrill username</button>':'')+'</div></div>'
+    : (A.on?'<button class="btn ghost sm" id="loginBtn">Log in</button>':'<button class="btn ghost sm" id="linkBtn">Link account</button>'))+
+    '<a class="btn sm" target="_blank" rel="noopener" href="'+esc(c.signupUrl)+'">Sign up</a>';
+  $('#footLinks').innerHTML='<a target="_blank" rel="noopener" href="'+esc(c.signupUrl)+'">Sign up on '+esc(c.name)+'</a>'+
+    S.data.socials.map(s=>'<a target="_blank" rel="noopener" href="'+esc(s.url)+'">'+esc(s.label)+'</a>').join('')+
+    '<a target="_blank" rel="noopener" href="https://www.begambleaware.org">BeGambleAware</a>';
+  $('#footNote').textContent='ZyrosTV Rewards · '+c.name+' affiliate · I earn a commission when you play under code '+c.code+' · 18+ · play responsibly';
+  $('#linkTxt').innerHTML='Type the username you play with on '+esc(c.name)+' under code <b>'+esc(c.code)+'</b>. It\'s saved in this browser only, and rewards are checked before they\'re paid.';
+  const lb=$('#linkBtn'); if(lb) lb.onclick=openLink;
+  const lg=$('#loginBtn'); if(lg) lg.onclick=()=>openAuth('login');
+  const cb=$('#chipBtn');
+  if(cb){
+    cb.onclick=e=>{ e.stopPropagation(); $('#menu').classList.toggle('open'); };
+    const u=$('#unlinkBtn'); if(u) u.onclick=()=>{ store.del(LINK_KEY); location.hash='#/'; location.reload(); };
+    const ml=$('#mLogin'); if(ml) ml.onclick=()=>openAuth('login');
+    const mo=$('#mLogout'); if(mo) mo.onclick=logout;
+  }
+}
+document.addEventListener('click',()=>{ const m=$('#menu'); if(m) m.classList.remove('open'); });
+function openLink(){ $('#linkErr').textContent=''; const d=$('#linkDlg'); if(d.showModal) d.showModal(); else d.setAttribute('open',''); $('#linkInput').focus(); }
+$('#linkCancel').onclick=()=>$('#linkDlg').close();
+$('#linkForm').addEventListener('submit',async e=>{
+  e.preventDefault(); const u=$('#linkInput').value.trim(); if(!u) return;
+  try{ const h=await sha(u); store.set(LINK_KEY,{u,h}); location.reload(); }
+  catch(err){ $('#linkErr').textContent='Linking needs a secure (https) page.'; }
+});
+
+/* ====================== shared pieces ====================== */
+function updatedLine(){
+  const t = S.data.leaderboard.updatedAt || S.playersUpdated;
+  return '<div class="upd"><i></i>'+(t?'Updated '+esc(fmtDate(t)):'Updated by hand')+'</div>';
+}
+function row(p, rank, prize, maxW){
+  const real=!!p, me=real && S.linked && p.h===S.linked.h;
+  const pz = prize>0 ? money(prize) : '';
+  return '<div class="tr'+(me?' me':'')+'">'+
+    '<div class="rk'+(rank<=3?' t':'')+'">'+rank+'</div>'+
+    '<div class="pn">'+(real?esc(p.m):'<span style="color:#46514d">—</span>')+(me?'<span class="you">YOU</span>':'')+'</div>'+
+    '<div class="wcol"><div class="wg">'+(real?money(p.w):'<span style="color:#46514d">—</span>')+'</div>'+
+      (real?'<div class="bar"><i style="width:'+Math.max(2,Math.min(100,p.w/maxW*100))+'%"></i></div>':'')+'</div>'+
+    '<div class="pz'+(pz?'':' none')+'">'+(pz||'—')+'</div></div>';
+}
+function table(limit, from){
+  const pr=prizes(), maxW=S.board.length?S.board[0].w:1; let html='';
+  for(let i=from;i<limit;i++){
+    if(i>=S.board.length && i>=10) break;
+    html+=row(S.board[i]||null, i+1, pr[i]||0, maxW);
+  }
+  return '<div class="tr th"><div>Rank</div><div>Player</div><div class="wcol">Wagered</div><div style="text-align:right">Prize</div></div>'+html;
+}
+function podium(){
+  const pr=prizes(), order=[1,0,2];
+  return '<div class="podium">'+order.map(i=>{
+    const p=S.board[i], me=p && S.linked && p.h===S.linked.h;
+    return '<div class="card pod r'+(i+1)+'"><span class="medal">'+(i+1)+'</span>'+
+      '<div class="nm">'+(p?esc(p.m):'<span style="color:#46514d">—</span>')+(me?'<span class="you">YOU</span>':'')+'</div>'+
+      '<div class="wg">Wagered</div><div class="wv">'+(p?money(p.w):'—')+'</div>'+
+      '<div class="pz">'+money(pr[i]||0)+'</div></div>';
+  }).join('')+'</div>';
+}
+
+/* ====================== views ====================== */
+const V={};
+
+V.home=function(el){
+  const c=S.data.casino, lb=S.data.leaderboard;
+  el.innerHTML=
+  '<section class="banner"><div class="slash b"></div><div class="slash"></div><div class="wrap">'+
+    '<a class="pill" target="_blank" rel="noopener" href="'+esc((S.data.socials.find(s=>/kick/i.test(s.label))||{url:'https://kick.com/zyrostv'}).url)+'"><em>KICK</em> Watch ZyrosTV live</a>'+
+    '<h1 class="mega">Zyros<span>TV</span><br>Rewards</h1>'+
+    '<p class="lede">Slots, giveaways and a monthly leaderboard on <b>'+esc(c.name)+'</b>. Play under code <b>'+esc(c.code)+'</b> and the top 10 split <b>'+money(pool())+'</b> when the month closes.</p>'+
+    '<div class="cta"><a class="btn" target="_blank" rel="noopener" href="'+esc(c.signupUrl)+'">Sign up on '+esc(c.name)+' with code '+esc(c.code)+'</a><a class="btn ghost" href="#/leaderboard">Full standings</a></div>'+
+    '<p class="fine">I earn a commission when you play under code '+esc(c.code)+'. 18+ only. Gamble responsibly &mdash; <a href="https://www.begambleaware.org" target="_blank" rel="noopener" style="text-decoration:underline">BeGambleAware</a>.</p>'+
+  '</div></section>'+
+  '<div class="wrap"><section class="sec"><div class="stats">'+
+    '<div class="card stat"><label>Prize pool</label><div class="v g">'+money(pool())+'</div><small>Top 10 get paid</small></div>'+
+    '<div class="card stat"><label>Closes in</label><div class="v" id="hCd" style="font-size:30px;padding-top:6px">--</div><small>'+esc(lb.title)+'</small></div>'+
+    '<div class="card stat"><label>Players this month</label><div class="v">'+num(S.board.length)+'</div><small>Ranked by total wagered</small></div>'+
+  '</div></section>'+
+  '<section class="sec"><div class="sec-h"><div><h2>Top <span>10</span> leaderboard</h2>'+updatedLine()+'</div><a class="link" href="#/leaderboard">View full standings (top 100) &rarr;</a></div>'+
+    podium()+
+    '<div class="card tbl">'+table(10,3)+'<div class="foot-note">Names are partly hidden. Ranked by total wagered under code '+esc(c.code)+' this month.</div></div>'+
+    '<div class="more"><a class="btn" href="#/leaderboard">View full standings (top 100)</a></div>'+
+  '</section>'+
+  '<section class="sec"><div class="sec-h"><h2>More ways to <span>win</span></h2></div><div class="grid2" style="margin-top:0;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">'+
+    '<a class="card big" href="#/giveaway" style="text-decoration:none"><label>Daily giveaway</label><div class="v g" style="font-size:38px">Win every stream</div><p>Type the keyword in Kick chat, and the winner is drawn right here.</p></a>'+
+    '<a class="card big" href="#/rewards" style="text-decoration:none"><label>Wager rewards</label><div class="v g" style="font-size:38px">Claim as you wager</div><p>Hit a wager tier and unlock a reward you can claim once per leaderboard.</p></a>'+
+    '<a class="card big" href="#/raffle" style="text-decoration:none"><label>Raffle</label><div class="v g" style="font-size:38px">'+money(S.data.raffle.prize)+' every round</div><p>Every '+money(S.data.raffle.ticketRate)+' you wager earns a ticket.</p></a>'+
+  '</div></section></div>';
+  countdown($('#hCd',el), lb.endDate, 'Closed', 'Date TBA');
+};
+
+V.leaderboard=function(el){
+  const c=S.data.casino, lb=S.data.leaderboard, me=S.me;
+  const meBox = !S.linked
+    ? '<div class="v" style="font-size:26px">Not linked</div><small><a href="#" id="lnk" class="link">Link your username</a> to see your spot.</small>'
+    : me ? '<div class="v g">#'+me.rank+' <span style="font-size:22px;color:var(--muted)">of '+S.board.length+'</span></div><small>'+money(me.w)+' wagered'+(me.rank<=PAID?' &middot; in the money':'')+'</small>'
+         : '<div class="v" style="font-size:26px">Not ranked</div><small>No wagers found for '+esc(S.linked.u)+' yet.</small>';
+  el.innerHTML='<div class="wrap"><div class="pagehead"><h1>Full <span>standings</span></h1>'+
+    '<p>The top 100 this month, ranked by total wagered under code <b>'+esc(c.code)+'</b> on '+esc(c.name)+'. Only the top 10 are paid.</p>'+updatedLine()+'</div>'+
+    '<div class="stats"><div class="card stat"><label>Prize pool</label><div class="v g">'+money(pool())+'</div><small>Top 10 places paid</small></div>'+
+    '<div class="card stat"><label>Closes in</label><div class="v" id="lCd" style="font-size:30px;padding-top:6px">--</div></div>'+
+    '<div class="card stat"><label>Your position</label>'+meBox+'</div></div>'+
+    '<div class="card tbl" style="margin-top:18px">'+(S.board.length?table(Math.min(TOP_FULL,Math.max(S.board.length,10)),0):'<div class="empty">The leaderboard hasn\'t been published yet. Check back soon.</div>')+
+    '<div class="foot-note">Names are partly hidden. Showing the top '+TOP_FULL+'.</div></div></div>';
+  countdown($('#lCd',el), lb.endDate, 'Closed');
+  const l=$('#lnk',el); if(l) l.onclick=e=>{ e.preventDefault(); openLink(); };
+};
+
+V.rewards=function(el){
+  const c=S.data.casino, tiers=(S.data.rewards.tiers||[]).map(t=>({wager:Number(t.wager)||0,reward:t.reward})).sort((a,b)=>a.wager-b.wager);
+  const w=S.me?S.me.w:0, done=claims();
+  let top;
+  if(!S.linked) top='<div class="card userbar"><div><div class="sm">Not linked</div><div class="nm">Link your username</div></div><button class="btn" id="lnk">Link account</button></div>';
+  else top='<div class="card userbar"><div><div class="sm">Linked as</div><div class="nm">'+esc(S.linked.u)+'</div></div><div style="text-align:right"><div class="sm">Wagered this leaderboard</div><div class="nm" style="color:var(--green)">'+money(w)+'</div></div></div>';
+  let ladder;
+  if(!tiers.length) ladder='<div class="card soon" style="padding:44px 24px"><h2 style="font-size:46px">Tiers <span>soon</span></h2><p>The wager reward ladder is being set up. Check back shortly.</p></div>';
+  else{
+    const next=tiers.find(t=>w<t.wager);
+    ladder='<div class="ladder">'+tiers.map((t,i)=>{
+      const reached=S.me&&w>=t.wager, claimed=done.indexOf(i)>-1;
+      const act = claimed?'<span class="tag g">Claimed</span>'
+        : reached ? '<button class="btn sm" data-claim="'+i+'"'+(c.claimUrl?'':' disabled')+'>'+(c.claimUrl?'Claim':'Claims open soon')+'</button>'
+        : '<span class="tag">Locked</span>';
+      const pct = reached?100:Math.min(100,(w/t.wager)*100);
+      return '<div class="card tier'+(reached?' ok':'')+(claimed?' done':'')+'"><div class="n">'+(i+1)+'</div><div>'+
+        '<div class="w">'+money(t.wager)+'<small>wagered</small></div><div class="rw">'+esc(t.reward)+'</div>'+
+        (next===t&&S.me?'<div class="prog"><i style="width:'+pct+'%"></i></div>':'')+'</div><div class="act">'+act+'</div></div>';
+    }).join('')+'</div>';
+  }
+  el.innerHTML='<div class="wrap"><div class="pagehead"><h1>Wager <span>rewards</span></h1><p>Reach a wager tier under code <b>'+esc(c.code)+'</b> on '+esc(c.name)+' and its reward becomes claimable once. Claim before the leaderboard ends &mdash; the ladder resets when the next one starts.</p></div>'+
+    top+ladder+'<div class="msg" id="cm"></div></div>';
+  const l=$('#lnk',el); if(l) l.onclick=openLink;
+  el.querySelectorAll('[data-claim]').forEach(b=>b.onclick=async()=>{
+    const i=+b.dataset.claim, t=tiers[i], m=$('#cm',el); b.disabled=true; m.className='msg'; m.textContent='Sending…';
+    try{
+      const r=await fetch(c.claimUrl,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
+        body:JSON.stringify({username:S.linked.u,wager:w,tier:i+1,reward:t.reward,period:S.period})});
+      if(!r.ok) throw 0;
+      saveClaim(i); m.textContent='Claim sent! It will be paid after it\'s verified.'; V.rewards(el);
+      $('#cm',el).textContent='Claim sent! It will be paid after it\'s verified.';
+    }catch(e){ b.disabled=false; m.className='msg err'; m.textContent='Couldn\'t send that. Try again in a moment.'; }
+  });
+};
+
+V.raffle=function(el){
+  const r=S.data.raffle, mine=S.me?tickets(S.me.w):0;
+  const total=S.board.reduce((a,p)=>a+tickets(p.w),0), chance=total>0?(mine/total*100):0, win=r.latestWinner||{};
+  el.innerHTML='<div class="wrap"><div class="pagehead"><h1>Raffle <span>round '+esc(r.round)+'</span></h1><p>One <b>'+money(r.prize)+'</b> raffle every round. You earn a ticket for every <b>'+money(r.ticketRate)+'</b> you wager under code <b>'+esc(S.data.casino.code)+'</b>.</p></div>'+
+    '<div class="stats"><div class="card stat"><label>Prize</label><div class="v g">'+money(r.prize)+'</div><small>'+(r.drawDate?'Draw: '+esc(fmtDate(r.drawDate)):'Draw date announced on stream')+'</small></div>'+
+    '<div class="card stat"><label>Your tickets</label><div class="v">'+(S.linked?num(mine):'—')+'</div><small>'+(S.linked?(S.me?chance.toFixed(2)+'% win chance':'No wagers yet'):'<a href="#" id="lnk" class="link">Link account</a> to see yours')+'</small></div>'+
+    '<div class="card stat"><label>Tickets in the pool</label><div class="v">'+num(total)+'</div><small>All players</small></div></div>'+
+    '<div class="grid2"><div class="card big"><label>Latest winner</label>'+
+      (win.name?'<div class="v g" style="font-size:40px">'+esc(win.name)+'</div><p>Round '+esc(win.round)+(win.ticket?' &middot; ticket #'+esc(win.ticket):'')+'</p>':'<div class="v" style="font-size:34px;color:#46514d">No draw yet</div><p>The first winner will show here.</p>')+'</div>'+
+      '<div class="card big"><label>How it works</label><div class="steps" style="margin-top:10px">'+
+      '<div style="padding:0"><b>1</b><p>Link your '+esc(S.data.casino.name)+' username.</p></div><div style="padding:0"><b>2</b><p>Wager under code '+esc(S.data.casino.code)+' to earn tickets.</p></div><div style="padding:0"><b>3</b><p>A ticket is drawn live at the end of the round.</p></div></div></div></div></div>';
+  const l=$('#lnk',el); if(l) l.onclick=e=>{ e.preventDefault(); openLink(); };
+};
+
+V.shop=function(el){
+  el.innerHTML='<div class="wrap"><div class="pagehead"><h1>The <span>shop</span></h1></div>'+
+    '<div class="card soon"><h2>Coming <span>soon</span></h2><p>Something good is on the way. Follow along so you don\'t miss the opening.</p><a class="btn" href="#/socials">See socials</a></div></div>';
+};
+
+V.socials=function(el){
+  el.innerHTML='<div class="wrap"><div class="pagehead"><h1>Follow <span>ZyrosTV</span></h1><p>Stream times, giveaways and leaderboard updates.</p></div><div class="socials">'+
+    S.data.socials.map(s=>{ let host=''; try{ host=new URL(s.url).hostname.replace(/^www\./,''); }catch(e){}
+      return '<a class="card soc" target="_blank" rel="noopener" href="'+esc(s.url)+'"><b>'+esc(String(s.label).charAt(0).toUpperCase())+'</b><div><strong>'+esc(s.label)+'</strong><span>'+esc(host)+'</span></div></a>'; }).join('')+'</div></div>';
+};
+
+function accountCards(){
+  if(!A.on) return '';
+  let h='';
+  if(A.flash) h+='<div class="msg'+(A.flashErr?' err':'')+'" style="margin-top:20px">'+esc(A.flash)+'</div>';
+  if(!A.session){
+    return h+'<div class="card big" style="margin-top:22px"><label>Account</label><div class="v" style="font-size:32px">Log in to save your profile</div><p>Create an account to link your Kick and keep everything in one place.</p><p><button class="btn" id="acLogin">Log in / Create account</button></p></div>';
+  }
+  const p=A.profile||{};
+  return h+'<div class="grid2"><div class="card big"><label>Account</label><div class="v" style="font-size:24px;word-break:break-all">'+esc(A.session.user.email||'')+'</div><p><button class="btn ghost sm" id="acOut">Log out</button></p></div>'+
+    '<div class="card big"><label>Kick</label>'+(p.kick_username
+      ?'<div class="v g" style="font-size:34px">'+esc(p.kick_username)+'</div><p>Linked &middot; <button class="btn ghost sm" id="acKickOff">Unlink</button></p>'
+      :'<div class="v" style="font-size:28px;color:var(--muted)">Not linked</div><p><button class="btn sm" id="acKick">Link Kick</button></p>')+'</div></div>';
+}
+function bindAccount(el){
+  const g=id=>$('#'+id,el);
+  if(g('acLogin')) g('acLogin').onclick=()=>openAuth('login');
+  if(g('acOut')) g('acOut').onclick=logout;
+  if(g('acKick')) g('acKick').onclick=async e=>{ e.target.disabled=true; e.target.textContent='Opening Kick…';
+    try{ const d=await kickCall({action:'start'}); location.href=d.url; }catch(x){ A.flash=x.message; A.flashErr=true; route(); } };
+  if(g('acKickOff')) g('acKickOff').onclick=async()=>{ try{ await kickCall({action:'unlink'}); A.flash='Kick unlinked.'; A.flashErr=false; await loadProfile(); chrome(); route(); }catch(x){ A.flash=x.message; A.flashErr=true; route(); } };
+}
+
+V.profile=function(el){
+  const acct=accountCards();
+  if(!S.linked){
+    el.innerHTML='<div class="wrap"><div class="pagehead"><h1>My <span>profile</span></h1><p>Link your '+esc(S.data.casino.name)+' username to see your rank, raffle tickets and which rewards you can claim.</p></div>'+acct+
+      '<div style="margin-top:22px"><button class="btn" id="lnk">Link your '+esc(S.data.casino.name)+' username</button></div></div>';
+    $('#lnk',el).onclick=openLink; bindAccount(el); A.flash=''; return;
+  }
+  const me=S.me, w=me?me.w:0, tiers=(S.data.rewards.tiers||[]).map(t=>({wager:+t.wager||0,reward:t.reward})).sort((a,b)=>a.wager-b.wager);
+  const done=claims(), ready=tiers.filter((t,i)=>w>=t.wager&&done.indexOf(i)<0), reached=tiers.filter(t=>w>=t.wager).length;
+  const pr=prizes(), top=me?(me.rank/S.board.length*100):0;
+  const readyAmt=ready.reduce((a,t)=>a+(parseFloat(String(t.reward).replace(/[^0-9.]/g,''))||0),0);
+  el.innerHTML='<div class="wrap"><div class="pagehead" style="padding-bottom:0"><h1>My <span>profile</span></h1></div>'+acct+
+    '<div class="profhead"><div class="avatar">'+esc(S.linked.u.charAt(0).toUpperCase())+'</div><div><div style="font-family:var(--head);font-weight:800;font-size:34px;line-height:1">'+esc(S.linked.u)+'</div>'+
+    '<div class="tags">'+(me?'<span class="tag g">Rank #'+me.rank+'</span>':'<span class="tag">Not ranked yet</span>')+(tiers.length?'<span class="tag">Tier '+reached+' / '+tiers.length+'</span>':'')+'</div></div></div>'+
+    '<div class="card big" style="margin-top:22px"><label>Wagered this leaderboard</label><div class="v">'+money(w)+'</div>'+
+    '<p>'+(me?'Rank '+me.rank+' of '+S.board.length+' &middot; top '+top.toFixed(1)+'%':'We haven\'t found wagers for this username yet.')+'</p>'+
+    '<div class="trio"><div><label>To rank 1</label><div class="v">'+(me&&me.rank>1?money(S.board[0].w-me.w):me?'You\'re #1':'—')+'</div></div>'+
+    '<div><label>Prize if it closed now</label><div class="v" style="color:var(--green)">'+(me&&pr[me.rank-1]?money(pr[me.rank-1]):'$0')+'</div></div>'+
+    '<div><label>Period closes</label><div class="v" id="pCd" style="font-size:22px;padding-top:5px">--</div></div></div></div>'+
+    '<div class="grid2"><div class="card big"><label>Raffle tickets</label><div class="v">'+num(me?tickets(w):0)+'</div><p><a class="link" href="#/raffle">See the raffle</a></p></div>'+
+    '<div class="card big"><label>Ready to claim</label><div class="v g">'+(readyAmt?money(readyAmt):ready.length+' reward'+(ready.length===1?'':'s'))+'</div><p>'+(tiers.length?ready.length+' waiting &middot; '+done.length+' claimed this period':'Tiers coming soon')+' &middot; <a class="link" href="#/rewards">Go to rewards</a></p></div></div>'+
+    '<div style="margin-top:22px"><button class="btn ghost sm" id="un">Unlink '+esc(S.data.casino.name)+' username</button></div></div>';
+  countdown($('#pCd',el), S.data.leaderboard.endDate, 'Closed');
+  $('#un',el).onclick=()=>{ store.del(LINK_KEY); location.hash='#/'; location.reload(); };
+  bindAccount(el); A.flash='';
+};
+
+
+
+function gvShell(inner){ return '<div class="wrap"><div class="pagehead"><h1>Daily <span>giveaway</span></h1><p>Type the daily keyword in the ZyrosTV Kick chat while the giveaway is open. Link your Kick on your profile to see your entry here.</p></div>'+inner+'</div>'; }
+const when = iso => { const d=new Date(iso); return isNaN(d)?'':d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); };
+
+V.giveaway=function(el){
+  if(!A.on){ el.innerHTML=gvShell('<div class="card soon"><h2>Coming <span>soon</span></h2><p>Daily giveaways are being set up. Watch the stream for the keyword.</p><a class="btn" target="_blank" rel="noopener" href="https://kick.com/zyrostv">Watch on Kick</a></div>'); return; }
+  el.innerHTML=gvShell('<div id="gvBody" class="card big">Loading…</div>');
+  const load=async()=>{
+    if(!el.isConnected) return;
+    try{
+      const r=await A.client.from('giveaways').select('id,title,prize,status,winner_name,created_at,drawn_at').order('id',{ascending:false}).limit(11);
+      const rows=r.data||[], cur=rows[0];
+      let count=0, mine=false;
+      if(cur){
+        const c=await A.client.rpc('giveaway_entry_count',{gid:cur.id}); count=Number(c.data)||0;
+        if(A.session&&A.profile&&A.profile.kick_id){
+          const m=await A.client.from('giveaway_entries').select('giveaway_id').eq('giveaway_id',cur.id).eq('kick_id',A.profile.kick_id).maybeSingle();
+          mine=!!m.data;
+        }
+      }
+      if(!el.isConnected) return;
+      const body=$('#gvBody',el);
+      if(!cur){ body.className='card soon'; body.innerHTML='<h2>No giveaway <span>right now</span></h2><p>Watch the stream. When a giveaway opens, the keyword is announced live.</p><a class="btn" target="_blank" rel="noopener" href="https://kick.com/zyrostv">Watch on Kick</a>'; return; }
+      const st=cur.status==='open'?'<span class="tag g">OPEN</span>':cur.status==='drawn'?'<span class="tag g">WINNER DRAWN</span>':'<span class="tag">ENTRIES CLOSED</span>';
+      let mid='';
+      if(cur.status==='drawn') mid='<div style="margin-top:18px"><label style="color:var(--muted);font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase">Winner</label><div class="v g" style="font-family:var(--display);font-size:clamp(40px,8vw,72px);line-height:1;text-transform:uppercase">'+esc(cur.winner_name)+'</div></div>';
+      else if(cur.status==='open') mid='<p style="margin-top:14px;font-size:17px;color:#d7dfdb">Type today\'s keyword in the <a class="link" target="_blank" rel="noopener" href="https://kick.com/zyrostv">ZyrosTV Kick chat</a> to enter.</p>';
+      else mid='<p style="margin-top:14px;font-size:17px;color:#d7dfdb">Entries are closed. The winner is drawn live.</p>';
+      let you='';
+      if(!A.session) you='<p style="margin-top:6px"><a class="link" href="#" id="gvLogin">Log in</a> and link your Kick to see if you\'re entered.</p>';
+      else if(!(A.profile&&A.profile.kick_id)) you='<p style="margin-top:6px"><a class="link" href="#/profile">Link your Kick</a> to see if you\'re entered.</p>';
+      else you='<p style="margin-top:6px;font-weight:700;color:'+(mine?'var(--green)':'var(--muted)')+'">'+(mine?'You\'re entered ✓':(cur.status==='open'?'You haven\'t entered yet':'You weren\'t entered'))+'</p>';
+      body.className='card big';
+      body.innerHTML='<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center"><label style="margin:0">'+esc(cur.title)+' &middot; '+esc(when(cur.created_at))+'</label>'+st+'</div>'+
+        (cur.prize?'<div class="v g" style="margin-top:8px">'+esc(cur.prize)+'</div>':'')+
+        '<p style="margin-top:4px">'+num(count)+' '+(count===1?'entry':'entries')+'</p>'+mid+you;
+      const gl=$('#gvLogin',el); if(gl) gl.onclick=e=>{ e.preventDefault(); openAuth('login'); };
+      const past=rows.slice(1).filter(x=>x.status==='drawn');
+      if(past.length&&!$('#gvPast',el)){
+        el.querySelector('.wrap').insertAdjacentHTML('beforeend','<div class="sec-h" style="margin-top:34px"><h2>Past <span>winners</span></h2></div><div class="card tbl" id="gvPast">'+past.map(x=>'<div class="tr" style="grid-template-columns:90px 1fr auto"><div class="rk" style="font-size:16px">'+esc(when(x.created_at))+'</div><div class="pn">'+esc(x.winner_name)+'</div><div class="pz" style="font-size:17px">'+esc(x.prize)+'</div></div>').join('')+'</div>');
+      }
+    }catch(e){ const b=$('#gvBody',el); if(b) b.textContent='Couldn\'t load the giveaway. Try refreshing.'; }
+  };
+  load(); timers.push(setInterval(load,15000));
+};
+
+V.host=function(el){
+  const head='<div class="wrap"><div class="pagehead"><h1>Host <span>giveaway</span></h1></div>';
+  if(!A.on||!A.session||!A.isAdmin){ el.innerHTML=head+'<div class="card big"><p>This page is for hosts only.</p></div></div>'; return; }
+  const flash=A.flash?'<div class="msg'+(A.flashErr?' err':'')+'" style="margin-top:0;margin-bottom:14px">'+esc(A.flash)+'</div>':''; A.flash='';
+  el.innerHTML=head+flash+'<div class="card big"><label>Kick chat feed</label><p style="color:#d7dfdb;margin-bottom:12px">One-time setup. Log in to Kick as ZyrosTV so the site can read chat for the keyword.</p><button class="btn sm" id="hConnect">Connect Kick chat</button></div>'+
+    '<div id="hMain" class="card big" style="margin-top:14px">Loading…</div></div>';
+  $('#hConnect',el).onclick=async e=>{ e.target.disabled=true; try{ store.set('zyrosKickPurpose','connect'); const d=await fnCall('giveaway-admin',{action:'connect_start'}); location.href=d.url; }catch(x){ store.del('zyrosKickPurpose'); e.target.disabled=false; A.flash=x.message; A.flashErr=true; V.host(el); } };
+  const say=(t,bad)=>{ const m=$('#hMsg',el); if(m){ m.className='msg'+(bad?' err':''); m.textContent=t; } };
+  const act=async(body,okMsg)=>{ try{ const d=await fnCall('giveaway-admin',body); await draw(); say(okMsg?okMsg(d):'Done.'); }catch(x){ say(x.message,true); } };
+  const draw=async()=>{
+    if(!el.isConnected) return;
+    const r=await A.client.from('giveaways').select('id,title,prize,status,winner_name').order('id',{ascending:false}).limit(1);
+    const cur=(r.data||[])[0], box=$('#hMain',el); if(!box) return;
+    let h='';
+    if(cur&&(cur.status==='open'||cur.status==='closed')){
+      let ent={count:0,latest:[]}; try{ ent=await fnCall('giveaway-admin',{action:'entries',id:cur.id}); }catch(e){}
+      h+='<label>Current giveaway</label><div class="v" style="font-size:34px">'+esc(cur.title)+'</div><p>'+esc(cur.prize)+' &middot; '+(cur.status==='open'?'<b style="color:var(--green)">OPEN</b>':'CLOSED')+' &middot; '+ent.count+' entries</p>'+
+        (ent.latest.length?'<p style="font-size:13px">Latest: '+ent.latest.map(esc).join(', ')+'</p>':'')+
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'+(cur.status==='open'?'<button class="btn ghost sm" id="hClose">Close entries</button>':'')+'<button class="btn sm" id="hDraw">Draw winner</button></div>';
+    }else{
+      if(cur&&cur.status==='drawn') h+='<label>Last winner</label><div class="v g" style="font-size:40px">'+esc(cur.winner_name)+'</div><p>'+esc(cur.title)+' &middot; '+esc(cur.prize)+'</p><div style="margin:12px 0 22px"><button class="btn ghost sm" id="hReroll">Re-roll winner</button></div>';
+      h+='<label>Start a new giveaway</label><div style="display:grid;gap:10px;margin-top:10px;max-width:460px"><input class="hin" id="hTitle" placeholder="Title (Daily giveaway)" value="Daily giveaway"><input class="hin" id="hPrize" placeholder="Prize (e.g. $50)"><input class="hin" id="hKey" placeholder="Secret keyword for chat (e.g. zyros)"><button class="btn sm" id="hOpen" style="justify-self:start">Open giveaway</button></div>';
+    }
+    box.innerHTML=h+'<div class="msg" id="hMsg" style="margin-top:14px"></div>';
+    const g=id=>$('#'+id,box);
+    if(g('hClose')) g('hClose').onclick=()=>act({action:'close',id:cur.id},()=>'Entries closed.');
+    if(g('hDraw')) g('hDraw').onclick=()=>act({action:'draw',id:cur.id},d=>'Winner: '+d.winner);
+    if(g('hReroll')) g('hReroll').onclick=()=>act({action:'draw',id:cur.id},d=>'New winner: '+d.winner);
+    if(g('hOpen')) g('hOpen').onclick=()=>act({action:'open',title:g('hTitle').value,prize:g('hPrize').value,keyword:g('hKey').value},()=>'Giveaway is open. Say the keyword on stream!');
+  };
+  draw(); timers.push(setInterval(()=>{ if(el.isConnected&&!document.activeElement.classList.contains('hin')) draw(); },10000));
+};
+
+/* ====================== router ====================== */
+function route(){
+  timers.forEach(clearInterval); timers=[];
+  const h=location.hash; let name='home';
+  if(h.indexOf('#/')===0) name=h.slice(2).split('?')[0]||'home';
+  if(!V[name]) name='home';
+  const app=$('#app'); app.innerHTML='';
+  document.querySelectorAll('#tabs a').forEach(a=>a.classList.toggle('on',a.dataset.k===name));
+  document.title = name==='home'?'ZyrosTV Rewards':(name.charAt(0).toUpperCase()+name.slice(1)+' | ZyrosTV Rewards');
+  try{ V[name](app); }catch(e){ console.error(e); app.innerHTML='<div class="wrap" style="padding-top:60px">Something went wrong loading this page. Try refreshing.</div>'; }
+  window.scrollTo(0,0);
+}
+
+(async function start(){
+  const cfg=window.ZY_CONFIG||{};
+  const live=cfg.supabaseUrl?getJson(cfg.supabaseUrl+'/functions/v1/thrill-sync',9000):Promise.resolve(null);
+  const [d,lp,fp]=await Promise.all([getJson('./data.json'),live,getJson('./players.json')]);
+  const p=(lp&&Array.isArray(lp.players)&&!lp.error)?lp:(lp&&Array.isArray(lp.players)&&lp.stale?lp:fp);
+  S.data=merge(DEFAULTS,d||{});
+  const list=(p&&Array.isArray(p.players))?p.players:[];
+  S.players=list.filter(x=>x&&x.h).map(x=>({h:x.h,m:x.m||'***',w:Number(x.w)||0}));
+  S.playersUpdated=(p&&p.updatedAt)||'';
+  await initAuth();
+  rebuild(); chrome();
+  window.addEventListener('hashchange',route); route();
+})();
+})();
+</script>
+</body>
+</html>
