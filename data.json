@@ -27,18 +27,18 @@
   "leaderboard": {
     "title": "Monthly leaderboard",
     "endDate": "",
-    "updatedAt": "2026-10-31T04:00:36.259Z",
+    "updatedAt": "2026-10-31T04:12:42.305Z",
     "prizes": [
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
+      700,
+      450,
+      300,
+      150,
+      100,
+      80,
+      60,
+      60,
+      50,
+      50
     ]
   },
   "rewards": {
