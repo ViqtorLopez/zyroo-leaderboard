@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tournament Widget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --green:#53fc18; --red:#ff5b69; --text:#f3f6f4; --muted:#8c9893; }
+  *{box-sizing:border-box;margin:0}
+  html,body{background:transparent;overflow:hidden;font-family:'Inter',system-ui,sans-serif;color:var(--text)}
+  .box{position:absolute;left:12px;right:12px;bottom:12px;border-radius:14px;background:rgba(10,13,15,.94);border:1px solid #2a3235;box-shadow:0 10px 30px rgba(0,0,0,.5);padding:12px 18px 16px;transition:opacity .4s}
+  .top{display:flex;justify-content:space-between;align-items:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.14em;font-size:13px;color:var(--muted);text-transform:uppercase}
+  .top .live{display:flex;align-items:center;gap:6px}
+  .top .live i{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:p 1.6s infinite}
+  @keyframes p{50%{opacity:.35}}
+  .row{display:grid;grid-template-columns:1fr 54px 1fr;align-items:center;gap:10px;margin-top:10px}
+  .side{display:flex;align-items:center;gap:12px;min-width:0}
+  .side.b{flex-direction:row-reverse;text-align:right}
+  .logo{flex:none;width:58px;height:58px;border-radius:12px;display:grid;place-items:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:28px;color:#000}
+  .a .logo{background:var(--green)} .b .logo{background:var(--red)}
+  .who{min-width:0}
+  .slot{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:26px;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .prov{font-size:13px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mult{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:30px;margin-top:2px}
+  .a .mult{color:var(--green)} .b .mult{color:var(--red)}
+  .mult.lead{text-shadow:0 0 14px currentColor}
+  .vs{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:34px;color:#46514d;text-align:center}
+  .msg{text-align:center;padding:18px 0 6px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:34px;text-transform:uppercase}
+  .msg small{display:block;font-family:'Inter',sans-serif;font-weight:600;font-size:14px;color:var(--muted);text-transform:none;margin-top:6px}
+  .msg b{color:var(--green)}
+  .hide{opacity:0;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="box hide" id="box"></div>
+<script>
+/* OBS browser source: add this page's URL as a Browser source (suggested size 760 x 190). It reads the live tournament and updates by itself. */
+const API = 'https://jvkbejhctbifeewcimwp.supabase.co/functions/v1/tournament';
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ADV = [2, 1], SIZES = [4, 2, 1], ROUND = ['Round 1', 'Round 2', 'Final'];
+function side(x){
+  const slots = (x.slots || []).map((s, i) => ({ i, name: s.name || ('Slot ' + (i + 1)), m: [s.r1, s.r2, s.r3] }));
+  let active = slots.slice(); const out = [];
+  for(let r = 0; r < 3; r++){
+    const rows = active.map(s => ({ i: s.i, name: s.name, v: s.m[r] }));
+    const done = rows.length > 0 && rows.every(z => z.v != null);
+    let next = null, tie = false;
+    if(r < 2 && done){
+      const n = ADV[r], sorted = rows.slice().sort((a, b) => b.v - a.v);
+      if(sorted.length > n && sorted[n - 1].v === sorted[n].v) tie = true; else next = sorted.slice(0, n).map(z => z.i);
+    }
+    out.push({ rows, tie });
+    active = next ? slots.filter(s => next.indexOf(s.i) > -1) : [];
+  }
+  return out;
+}
+const fmt = v => v == null ? '—' : Number(v).toLocaleString('en-US', { maximumFractionDigits: 2 }) + 'x';
+const ini = s => (String(s || '?').trim().charAt(0) || '?').toUpperCase();
+function render(d){
+  const box = document.getElementById('box'), st = d && d.state;
+  if(!st || !st.visible){ box.classList.add('hide'); return; }
+  const nA = st.a.name || 'Provider A', nB = st.b.name || 'Provider B', c = d.counts || { a: 0, b: 0 };
+  let html = '';
+  if(st.winner){
+    const w = st.winner === 'a' ? nA : nB, n = c[st.winner] || 0;
+    html = '<div class="msg"><b>' + esc(w) + '</b> wins!<small>' + (n ? n + ' viewer' + (n === 1 ? '' : 's') + ' split $' + (Math.floor((Number(st.pot) || 0) * 100 / n) / 100) + ' each' : 'Tournament complete') + '</small></div>';
+  }else if(st.status === 'setup' || st.status === 'open'){
+    html = '<div class="msg">' + esc(nA) + ' <span style="color:#46514d">vs</span> ' + esc(nB) + '<small>' + (st.status === 'open' ? 'Entries open at zyrorewards.com &middot; $' + Number(st.pot) + ' pot' : 'Starting soon') + '</small></div>';
+  }else{
+    const RA = side(st.a), RB = side(st.b);
+    let cur = null;
+    for(let r = 0; r < 3 && !cur; r++){
+      for(let j = 0; j < SIZES[r]; j++){
+        const a = RA[r].rows[j], b = RB[r].rows[j];
+        if(a && b && (a.v == null || b.v == null)){ cur = { r, j, a, b }; break; }
+      }
+    }
+    if(!cur){
+      const tie = RA.concat(RB).some(x => x.tie);
+      const f = [RA[2].rows[0], RB[2].rows[0]];
+      html = '<div class="msg">' + (tie ? 'Rematch needed' : 'Waiting for results') + '<small>' + esc(nA) + ' vs ' + esc(nB) + '</small></div>';
+    }else{
+      const { r, j, a, b } = cur, lead = (a.v != null && b.v != null) ? 0 : (a.v != null || b.v != null ? (a.v != null ? 1 : 2) : 0);
+      html = '<div class="top"><span>' + ROUND[r] + (SIZES[r] > 1 ? ' &middot; Match ' + (j + 1) + ' of ' + SIZES[r] : ' &middot; 1v1') + '</span><span class="live"><i></i>Live</span></div>' +
+        '<div class="row"><div class="side a"><div class="logo">' + esc(ini(nA)) + '</div><div class="who"><div class="slot">' + esc(a.name) + '</div><div class="prov">' + esc(nA) + '</div><div class="mult' + (lead === 1 ? ' lead' : '') + '">' + fmt(a.v) + '</div></div></div>' +
+        '<div class="vs">VS</div>' +
+        '<div class="side b"><div class="logo">' + esc(ini(nB)) + '</div><div class="who"><div class="slot">' + esc(b.name) + '</div><div class="prov">' + esc(nB) + '</div><div class="mult' + (lead === 2 ? ' lead' : '') + '">' + fmt(b.v) + '</div></div></div></div>';
+    }
+  }
+  box.innerHTML = html; box.classList.remove('hide');
+}
+async function tick(){
+  try{ const r = await fetch(API + '?t=' + Date.now()); if(r.ok) render(await r.json()); }catch(e){ /* keep last frame */ }
+}
+tick(); setInterval(tick, 4000);
+</script>
+</body>
+</html>
