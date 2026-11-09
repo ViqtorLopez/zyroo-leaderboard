@@ -28,7 +28,7 @@
     "title": "Monthly leaderboard",
     "startDate": "2026-10-28",
     "endDate": "2026-12-01T01:00:00",
-    "updatedAt": "2026-11-09T22:32:23.778Z",
+    "updatedAt": "2026-11-09T22:36:27.028Z",
     "prizes": [
       700,
       450,
@@ -134,7 +134,7 @@
   "raffle": {
     "prize": 150,
     "round": 2,
-    "ticketRate": 50,
+    "ticketRate": 25,
     "drawDate": "",
     "baseline": {
       "period": "2026-10-28_2026-12-02",
