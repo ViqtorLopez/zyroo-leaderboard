@@ -28,7 +28,7 @@
     "title": "Monthly leaderboard",
     "startDate": "2026-10-28",
     "endDate": "2026-12-01T01:00:00",
-    "updatedAt": "2026-11-09T22:11:00.979Z",
+    "updatedAt": "2026-11-09T22:32:16.744Z",
     "prizes": [
       700,
       450,
@@ -133,12 +133,46 @@
   },
   "raffle": {
     "prize": 150,
-    "round": 1,
+    "round": 2,
     "ticketRate": 50,
     "drawDate": "",
+    "baseline": {
+      "period": "2026-10-28_2026-12-02",
+      "w": {
+        "f38c4e71d2e3d99df303ee775af881de12e3c339a69a012c30aedfa224abe5ea": 4631.78,
+        "953e796a13daf18ff89ef3dcc3b19a855dd24d876763d6d239ca97aa0d0b0b2c": 4149.74,
+        "a6e72143f36ace482ba689df5f15ab9917e3a960bca80bb27418a1e369989ce3": 865.79,
+        "82c49899291894273df36b3f68439ebf3e4b5e40baef36f4f1a3f88fe1317e50": 847.97,
+        "28f47115f75852def6d8c967ad655cb0dffa28df83edffc29003875d5aeb2b8b": 629.01,
+        "62434d398a24d4f5d66462d211ef92ae399f607aca56ffbc9a22e09be3eb7c20": 545.27,
+        "ac3591a6569e6e8688d7f0b5a070f8e4f9b1dad2ce325f19b87e69737b3711e1": 545.15,
+        "6730886dfc197580edc1608fe0e89daa9bb7ddc72df077c7a76a7f37d591dcf2": 410.6,
+        "37ce93664d8fc944dda1c0e60fa15d6379e708ea1c3d7c70347ca61210afc238": 264.83,
+        "480066ec667667e333f41c41c795d4adc217e56a8be298cc104d813a1a01e072": 237.65,
+        "12d4766668ebb4e454dce0e0c4ec524cf9f2ab9ce8ed6a8c3cb71b65ad853029": 236.4,
+        "de9a7d8b2700172b993545ae06917ad8f18d5dfe199681316fa0a8a32c89873c": 207.33,
+        "2af5febfc9aa2621f0cbbf4e726a0b72c11ecf2b60e864b4b7d15ebcff6714a2": 132.43,
+        "6c7da015ef13d4203c40ee1dc73152a40a150a78fc33083438d68a3b011b1e5a": 118.66,
+        "3015802f6a90e00bde06bcfc0fea5e6a93d9db1e93d090385dd2e22b6cb53b3e": 111.44,
+        "a0a70c7bf116c7f9872e90697fca6e4bb7d54c6d39614088b4f21f91c26e064b": 91.66,
+        "fd48c79e62aae30ffc0a80a3d1377454a07efae93b933161eadb79ce895fbe3b": 55.7,
+        "2851a97a8055d4a210eda5d5dc061381352c36c60a0fbdabdc40687f1847d2c5": 35.96,
+        "cab362f4ff9b7d96218f90a543c7f66235bc5c3320c7e7d5267a4857a781a734": 34.53,
+        "a1c0bd711c602ef42787374c21647e5c6cdbb903abd5f727ce5f8f8c7e6faf5e": 32.84,
+        "8207b7aa8f829402cde64e599e1ba423f5ebf91d3ab6198a00cc56833123ea7d": 9.94,
+        "5083e1291f71f3ecf8bd9e07c8cc11a1a24ac161a08ece25d3337b64858732b5": 4.81,
+        "53059191cf7f36f6f85e5147b8e5c4e7210736dd098668875af18c8d84eb0801": 3.87,
+        "92966f7260938673b0a4acdd5b4da3f0f6e564c66bf64ccf78c71b1ba651b68e": 3.85,
+        "10ce1de4b8142140f16c55e6ae36876d45d3d2672a1fdc8b644d22a0b974402f": 3.81,
+        "8a26f6d332489d23350e6b3007d31f40d035ac45557462c20d20fafefbe8248b": 1.29,
+        "b330ac264456045af1f620baaa96f15efe8845db6c7c988f6e1586eb8599fdd7": 0.81,
+        "243d29c4b8e95eee93a262d60d76c6cb84c18dc52c97532940bb01a4b9bef340": 0.67,
+        "6241b5e5234f5d2fe043280650d27e8b26741a30133a5aff71dcd6dedf9559a5": 0.22
+      }
+    },
     "latestWinner": {
       "name": "lo***a",
-      "ticket": "93",
+      "ticket": "54",
       "round": 1
     }
   },
