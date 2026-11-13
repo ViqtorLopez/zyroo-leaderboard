@@ -28,7 +28,7 @@
     "title": "Monthly leaderboard",
     "startDate": "2026-10-28",
     "endDate": "2026-12-01T01:00:00",
-    "updatedAt": "2026-11-09T22:36:27.028Z",
+    "updatedAt": "2026-11-13T01:04:18.713Z",
     "prizes": [
       700,
       450,
@@ -51,83 +51,83 @@
     "tiers": [
       {
         "wager": 12500,
-        "reward": 10
+        "reward": 20
       },
       {
         "wager": 25000,
-        "reward": 15
-      },
-      {
-        "wager": 50000,
-        "reward": 25
-      },
-      {
-        "wager": 75000,
         "reward": 30
       },
       {
-        "wager": 125000,
+        "wager": 50000,
         "reward": 50
       },
       {
+        "wager": 75000,
+        "reward": 60
+      },
+      {
+        "wager": 125000,
+        "reward": 100
+      },
+      {
         "wager": 250000,
-        "reward": 100
-      },
-      {
-        "wager": 375000,
-        "reward": 100
-      },
-      {
-        "wager": 500000,
-        "reward": 150
-      },
-      {
-        "wager": 750000,
         "reward": 200
       },
       {
-        "wager": 1000000,
+        "wager": 375000,
+        "reward": 200
+      },
+      {
+        "wager": 500000,
         "reward": 300
+      },
+      {
+        "wager": 750000,
+        "reward": 400
+      },
+      {
+        "wager": 1000000,
+        "reward": 600
       },
       {
         "wager": 1250000,
-        "reward": 300
+        "reward": 600
       },
       {
         "wager": 1500000,
-        "reward": 300
+        "reward": 600
       },
       {
         "wager": 1750000,
-        "reward": 400
+        "reward": 800
       },
       {
         "wager": 2000000,
-        "reward": 400
+        "reward": 800
       },
       {
         "wager": 2250000,
-        "reward": 400
+        "reward": 800
       },
       {
         "wager": 2500000,
-        "reward": 500
-      },
-      {
-        "wager": 3750000,
         "reward": 1000
       },
       {
-        "wager": 5000000,
-        "reward": 1500
-      },
-      {
-        "wager": 7500000,
+        "wager": 3750000,
         "reward": 2000
       },
       {
-        "wager": 10000000,
+        "wager": 5000000,
         "reward": 3000
+      },
+      {
+        "wager": 7500000,
+        "reward": 4000
+      },
+      {
+        "wager": 10000000,
+        "reward": 6000
       }
     ]
   },
